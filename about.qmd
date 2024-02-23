@@ -29,7 +29,7 @@ Alexandra is an undergraduate student majoring in Computer Science and Psycholog
 
 ## Nathan Rosenblum
 
-Nathan is a senior studying Applied Mathematics, his github page is <https://github.com/nrosenblum>.
+Nathan is a undergraduate senior studying Applied Mathematics, his github page is <https://github.com/nrosenblum>.
 
 ## Eric Yang
 
