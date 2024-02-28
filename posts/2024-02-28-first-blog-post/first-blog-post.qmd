@@ -11,3 +11,10 @@ draft: FALSE
 Link: <https://data.boston.gov/dataset/shootings/resource/73c7e069-701f-4910-986d-b950f46c91a1?inner_span=True>
 
 This dataset from Analyze Boston contains information about shootings in Boston, comprised of 1925 rows and 8 columns, labeled "incident_num", "shooting_date", "district", "shooting_type_v2", "victim_gender", "victim_race", "victim_ethnicity_NIBRS", and "multi_victim". The original collection of this data might have been driven by law enforcement or public safety organizations aiming to monitor and respond to shooting incidents within the city. The inclusion of details like shooting type, victim demographics, and whether an incident involved multiple victims suggests an intent to understand patterns in gun violence, the demographic distribution of victims, and potentially identify areas or populations at higher risk. Loading and cleaning the data is possible, and initial steps could involve identifying any missing values. The main questions this dataset could address might revolve around identifying trends in shootings over time, assessing the distribution of shootings across different districts, understanding the demographic profile of victims, and analyzing the relationship between the type of shooting incidents and victim demographics. Challenges in analyzing this dataset might include dealing with missing or incomplete data.
+
+
+**Dataset 2 - Tobacco Use**
+
+Link: <https://catalog.data.gov/dataset/behavioral-risk-factor-data-tobacco-use-2011-to-present>
+
+This data set is from the U.S. Department of Health and Human Services. This data comes from the summation of several Tobacco surveys from 2011 to 2019. It contains 15 columns after cleaning and 43341 rows detailing location, year, race, type of tobacco consumption, gender, race, age, education, and more. This data could help us understand what demographics and locations have worse tobacco use habits, and how different age groups as well as levels of education may have different trends in tobacco use. Problems may arise from using this data set if different categories have different amounts of data, it may be harder to compare trends between categories.
