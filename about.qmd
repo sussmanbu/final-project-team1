@@ -25,12 +25,20 @@ This is a website for the final project for MA\[46\]15 Data Science with R by Te
 
 ## Alexandra Rodriguez
 
+Alexandra is an undergraduate student majoring in Computer Science and Psychology. Her Github page is <https://github.com/lexi0001>.
+
 ## Nathan Rosenblum
+
+Nathan is a undergraduate senior studying Applied Mathematics, his github page is <https://github.com/nrosenblum>.
 
 ## Eric Yang
 
 Eric is an undergraduate student in Economics with minors in Mathematics and History. His Github page is <https://github.com/ericyang02>.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> efde1e5fc30765b012d0da0a7d6472abafab2c91
 <!-- Please leave in the information below -->
 
 ### About this Template.
