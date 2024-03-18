@@ -1,5 +1,3 @@
-# This file is purely as an example. 
-# There are a few places
 
 library(tidyverse)
 
