@@ -1,0 +1,15 @@
+---
+title: "Blog 2"
+author: ""
+date: "2024-03-18"
+date-modified: "2024-03-18"
+draft: FALSE
+---
+
+**Data Background**
+
+Data was collected by the Boston Regional Intelligence Center under the Boston Police Department Bureau of Intelligence and Analysis. This data includes both fatal and non-fatal shootings (shooting_type_v2), if a victim was struck by a bullet within the City of Boston that falls under the jurisdiction of the Boston Police Department (district). The data does not include shootings that were deemed justifiable or self-inflicted gunshot wounds. The dataset serves as a benchmark for BPD to analyze safety and violence in Boston districts and to assess the allocation of their focus and resources. It is likely collected with the aim of monitoring and responding to shooting incidents within the city. The data is from 2015 forward.
+
+Potential issues with this data could include inconsistencies in reporting across districts, missing or incomplete data, variation in how incidents are classified, and potential biases in reporting (underreporting in certain neighborhoods). Bias might also exist due to overrepresentation of certain demographics as victims or systemic biases within law enforcement practices.
+
+This data could be used for various purposes including trend analysis over time, understanding spatial distribution across districts, examining victim demographics, and exploring relationships between shooting incidents and victim characteristics. There may have been prior research utilizing this data to understand patterns of gun violence in Boston or to inform policy decisions related to public safety. The data might inform policy decisions related to allocation of resources for crime prevention, community outreach efforts, or gun control measures. Questions from policymakers might include inquiries about trends in shootings, effectiveness of intervention programs, or factors contributing to high-risk areas.
