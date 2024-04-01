@@ -33,7 +33,7 @@ Nathan is a undergraduate senior studying Applied Mathematics, his github page i
 
 ## Eric Yang
 
-Eric is an undergraduate student in Economics with minors in Mathematics and History. His Github page is <https://github.com/ericyang02>.
+Eric is an undergraduate student in Economics with a minor in History. His Github page is <https://github.com/ericyang02>.
 
 <<<<<<< HEAD
 =======
