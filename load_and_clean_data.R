@@ -2,6 +2,7 @@
 library(tidyverse)
 library(readr)
 library(dplyr)
+library(here)
 
 #notes:
 #there are 1928 rows by default
@@ -46,8 +47,33 @@ district_mapping <- c("A1"="Downtown", "A15"="Charlestown", "A7"="East Boston", 
 shooting_data <- shooting_data %>%
   mutate("district_name" = case_when(district %in% names(district_mapping) ~ district_mapping[district]))
 
+#clean column data types and create date/time column
+date_time<-separate(shooting_data,shooting_date, into = c('Date','Time'), sep = " ")
+
+date_time$Time <- strptime(date_time$Time, format = "%H:%M:%S")
+date_time$Date = as.Date(date_time$Date)
+date_time$multi_victim <- ifelse(date_time$multi_victim == "t", 1, 0)
+
+
+#merge demographic data 
+demo<-read.csv(here::here("dataset", "redistricting_data_tract20_nbhd_hhpopsize_ab-1.csv"))
+
+district_names <-data.frame(district = c('A1','A15','A7','B2','B3','C6','C11','D4','D14','E5','E13','E18'),
+                            district_name = c('Downtown & Charlestown','Downtown & Charlestown','East Boston', 'Roxbury',
+                                              'Mattapan','South Boston','Dorchester','South End','Brighton','West Roxbury','Jamaica Plain','Hyde Park'))
+
+colnames(demo) <- as.character(unlist(demo[1,]))
+demo <- demo[-1,]
+colnames(demo)[1] <- "district_name"
+
+filtered_demo <- subset(demo, district_name %in% district_names$district_name)
+
+cleaned_data<-merge(date_time,filtered_demo,by = 'district_name')
+nrow(cleaned_data)
+sum(is.na(cleaned_data))
+
 #save to clean
-shooting_data_clean <- shooting_data
+shooting_data_clean <- cleaned_data
 
 #view for debug
 #View(shooting_data)
