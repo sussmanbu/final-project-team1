@@ -16,14 +16,13 @@ We searched for duplicate columns and initially thought we had found them as mul
 
 In the initial data set, date and time were combined in one column and they were both string values. To clean this column, we split the date and time into separate columns and modified the data types using the as.Date function and changed the time to match the format "%H:%M:%S" . Since the initial data set lacked demographic information for each district, we downloaded 2020 census data for each district and merged the data into our final cleaned data set. The demographic data columns of interest are household size, College/University student housing, Institutionalized population, Black, White, Hispanic or Latino, Asian, Native Hawaiian and Pacific Islander, and Other. The demographic data set did not include the district of Charlestown & Downtown resulting in a loss of 30 rows.
 
-**Data for Equity**
-
-**Beneficence** requires maximizing benefits while minimizing harm. Applying this principle to the data involves critically evaluating the risks and benefits of collecting, analyzing, and sharing information about shootings. For example, it entails carefully considering how the data could be used to improve public safety and community well-being without reinforcing negative stereotypes about certain communities. To adhere to this principle, data should be aggregated or anonymized while protecting individuals' identities, while still providing valuable insights for public safety efforts. **Transparency** is also crucial in maintaining the trust of the community from which the data was collected. It involves being clear about the collection methods, the purpose of the data, and how it will be used. Transparency also requires acknowledging the limitations of the analysis, such as potential biases in data collection (over or under reporting in certain areas) and the interpretations made from the data. Limitations in the analysis could include potential biases in how incidents are reported or recorded, leading to an incomplete or skewed understanding of crime patterns. Additionally, the data could also be misused to unfairly target specific communities.
-
-
-```{r echo=FALSE}
+```{r, message=FALSE, echo=FALSE}
 library(here)
 library(DT)
 shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
 datatable(shooting_data, options = list(scrollX = TRUE))
 ```
+
+**Data for Equity**
+
+**Beneficence** requires maximizing benefits while minimizing harm. Applying this principle to the data involves critically evaluating the risks and benefits of collecting, analyzing, and sharing information about shootings. For example, it entails carefully considering how the data could be used to improve public safety and community well-being without reinforcing negative stereotypes about certain communities. To adhere to this principle, data should be aggregated or anonymized while protecting individuals' identities, while still providing valuable insights for public safety efforts. **Transparency** is also crucial in maintaining the trust of the community from which the data was collected. It involves being clear about the collection methods, the purpose of the data, and how it will be used. Transparency also requires acknowledging the limitations of the analysis, such as potential biases in data collection (over or under reporting in certain areas) and the interpretations made from the data. Limitations in the analysis could include potential biases in how incidents are reported or recorded, leading to an incomplete or skewed understanding of crime patterns. Additionally, the data could also be misused to unfairly target specific communities.
