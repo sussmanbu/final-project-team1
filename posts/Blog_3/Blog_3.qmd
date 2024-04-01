@@ -1,0 +1,21 @@
+---
+title: "Data Cleaning"
+author: ""
+date: "2024-04-01"
+date-modified: "2024-04-01"
+draft: FALSE
+---
+
+**Blog Post 3: Data Cleaning**
+
+We first used View() to get a preliminary view of the data. We found that some of the column names and values were overly complicated and could be simplified and recategorized. For example, the column “victim_ethnicity_NIBRS” contained the values “Hispanic or Latinx” and “Not Hispanic or Latinx”. This was simplified into a “v_hispanic”or_latinx” column and the values were replaced with Booleans. The “shooting_type_v2” column (values: “fatal”, “not fatal”) were reformatted into the “fatal” column and Boolean values as well.
+
+The “district” column that came with the dataset only used district codes (“A7” for East Boston, “B2” for Roxbury, etc.). A list of Boston Districts and their respective codes was created with information from: https://police.boston.gov/districts/. This information was then used to create a new column “district_name” that contains the string name of the district where the shooting occurred. It is worth noting that on the website listed, A1 and A15 are listed as “A1 & A15”, “Downtown & Charlestown”; However, due to various other sources listing Downtown and Charlestown as separate districts, we separated them and mapped “A1” to “Downtown” and “A15” to “Charlestown”. Boston Police Department consistently refers to “A1” and “A15” together however, so we may remerge them in our dataset later. 
+
+We searched for duplicate columns and initially thought we had found them as multiple rows contained the same “incident_num”. However, upon further analysis, we found that shootings with multiple victims were split into multiple rows, as each row would correspond to each individual victim. Therefore, it would be incorrect to remove duplicates based on incident numbers. This conclusion is corroborated by the “multi_victim” column, which is true for rows in which the incident number is shared with other rows. 
+
+In the initial data set, date and time were combined in one column and they were both string values. To clean this column, we split the date and time into separate columns and modified the data types using the as.Date function and changed the time to match the format "%H:%M:%S" .  Since the initial data set lacked demographic information for each district, we downloaded 2020 census data for each district and merged the data into our final cleaned data set. The demographic data columns of interest are household size, College/University student housing, Institutionalized population, Black, White, Hispanic or Latino, Asian, Native Hawaiian and Pacific Islander, and Other. The demographic data set did not include the district of Charlestown & Downtown resulting in a loss of 30 rows. 
+
+**Data for Equity**
+
+Beneficence requires maximizing benefits while minimizing harm. Applying this principle to the data involves critically evaluating the risks and benefits of collecting, analyzing, and sharing information about shootings. For example, it entails carefully considering how the data could be used to improve public safety and community well-being without reinforcing negative stereotypes about certain communities. To adhere to this principle, data should be aggregated or anonymized while protecting individuals' identities, while still providing valuable insights for public safety efforts. Transparency is also crucial in maintaining the trust of the community from which the data was collected. It involves being clear about the collection methods, the purpose of the data, and how it will be used. Transparency also requires acknowledging the limitations of the analysis, such as potential biases in data collection (over or under reporting in certain areas) and the interpretations made from the data. Limitations in the analysis could include potential biases in how incidents are reported or recorded, leading to an incomplete or skewed understanding of crime patterns. Additionally, the data could also be misused to unfairly target specific communities.
