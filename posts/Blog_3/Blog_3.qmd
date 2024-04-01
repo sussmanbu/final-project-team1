@@ -22,7 +22,7 @@ In the initial data set, date and time were combined in one column and they were
 
 ```{r echo=FALSE}
 library(here)
-
+library(DT)
 shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
-head(shooting_data)
+datatable(shooting_data, options = list(scrollX = TRUE))
 ```
