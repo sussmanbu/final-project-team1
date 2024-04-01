@@ -20,6 +20,7 @@ In the initial data set, date and time were combined in one column and they were
 
 **Beneficence** requires maximizing benefits while minimizing harm. Applying this principle to the data involves critically evaluating the risks and benefits of collecting, analyzing, and sharing information about shootings. For example, it entails carefully considering how the data could be used to improve public safety and community well-being without reinforcing negative stereotypes about certain communities. To adhere to this principle, data should be aggregated or anonymized while protecting individuals' identities, while still providing valuable insights for public safety efforts. **Transparency** is also crucial in maintaining the trust of the community from which the data was collected. It involves being clear about the collection methods, the purpose of the data, and how it will be used. Transparency also requires acknowledging the limitations of the analysis, such as potential biases in data collection (over or under reporting in certain areas) and the interpretations made from the data. Limitations in the analysis could include potential biases in how incidents are reported or recorded, leading to an incomplete or skewed understanding of crime patterns. Additionally, the data could also be misused to unfairly target specific communities.
 
+
 ```{r echo=FALSE}
 library(here)
 library(DT)
