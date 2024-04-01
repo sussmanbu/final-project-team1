@@ -9,7 +9,7 @@
 <meta name="author" content="">
 <meta name="dcterms.date" content="2024-04-01">
 
-<title>MA [46]15 Final Project team 1 - Data Cleaning</title>
+<title>MA [46]15 Final Project team 1 - Blog 3: Data Cleaning</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -110,7 +144,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Data Cleaning</h1>
+      <h1 class="title">Blog 3: Data Cleaning</h1>
                       </div>
   </div>
     
@@ -152,6 +186,135 @@ ul.task-list li input[type="checkbox"] {
 <p>In the initial data set, date and time were combined in one column and they were both string values. To clean this column, we split the date and time into separate columns and modified the data types using the as.Date function and changed the time to match the format “%H:%M:%S” . Since the initial data set lacked demographic information for each district, we downloaded 2020 census data for each district and merged the data into our final cleaned data set. The demographic data columns of interest are household size, College/University student housing, Institutionalized population, Black, White, Hispanic or Latino, Asian, Native Hawaiian and Pacific Islander, and Other. The demographic data set did not include the district of Charlestown &amp; Downtown resulting in a loss of 30 rows.</p>
 <p><strong>Data for Equity</strong></p>
 <p><strong>Beneficence</strong> requires maximizing benefits while minimizing harm. Applying this principle to the data involves critically evaluating the risks and benefits of collecting, analyzing, and sharing information about shootings. For example, it entails carefully considering how the data could be used to improve public safety and community well-being without reinforcing negative stereotypes about certain communities. To adhere to this principle, data should be aggregated or anonymized while protecting individuals’ identities, while still providing valuable insights for public safety efforts. <strong>Transparency</strong> is also crucial in maintaining the trust of the community from which the data was collected. It involves being clear about the collection methods, the purpose of the data, and how it will be used. Transparency also requires acknowledging the limitations of the analysis, such as potential biases in data collection (over or under reporting in certain areas) and the interpretations made from the data. Limitations in the analysis could include potential biases in how incidents are reported or recorded, leading to an incomplete or skewed understanding of crime patterns. Additionally, the data could also be misused to unfairly target specific communities.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>here() starts at /Users/alexandrarodriguez/ma415/final-project-team1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>shooting_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"dataset"</span>, <span class="st">"BostonShootingDataClean.csv"</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(shooting_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  district_name incident_num       Date                 Time district
+1      Brighton    212083607 2021-11-15 2024-04-01T00:30:43Z      D14
+2      Brighton   I182064331 2018-08-12 2024-04-01T22:52:00Z      D14
+3      Brighton   I182061887 2018-08-04 2024-04-01T22:53:00Z      D14
+4      Brighton    222095607 2022-12-11 2024-04-01T02:26:00Z      D14
+5      Brighton    222016123 2022-03-07 2024-04-01T16:33:00Z      D14
+6      Brighton    212083607 2021-11-15 2024-04-01T00:30:30Z      D14
+  victim_gender               victim_race multi_victim v_hispanic_or_latinx
+1          Male Black or African American            1                FALSE
+2          Male                     White            0                 TRUE
+3        Female                     White            0                 TRUE
+4          Male Black or African American            0                FALSE
+5          Male Black or African American            0                FALSE
+6          Male Black or African American            1                FALSE
+  fatal Total. White.alone Black.or.African.American.alone Hispanic.or.Latino
+1 FALSE  52047       32694                            2414               5376
+2 FALSE  52047       32694                            2414               5376
+3 FALSE  52047       32694                            2414               5376
+4 FALSE  52047       32694                            2414               5376
+5 FALSE  52047       32694                            2414               5376
+6 FALSE  52047       32694                            2414               5376
+  Asian..Native.Hawaiian.and.Pacific.Islander.alone..all.ages
+1                                                        8703
+2                                                        8703
+3                                                        8703
+4                                                        8703
+5                                                        8703
+6                                                        8703
+  Other.Races.or.Multiple.Races...all.ages Total..1 White.alone.1
+1                                     2860    47657         30752
+2                                     2860    47657         30752
+3                                     2860    47657         30752
+4                                     2860    47657         30752
+5                                     2860    47657         30752
+6                                     2860    47657         30752
+  Black.or.African.American.alone.1 Hispanic.or.Latino.1
+1                              2076                 4388
+2                              2076                 4388
+3                              2076                 4388
+4                              2076                 4388
+5                              2076                 4388
+6                              2076                 4388
+  Asian..Native.Hawaiian.and.Pacific.Islander.alone..aged.18.
+1                                                        8082
+2                                                        8082
+3                                                        8082
+4                                                        8082
+5                                                        8082
+6                                                        8082
+  Other.Races.or.Multiple.Races..aged.18. Total..aged.0.17
+1                                    2359             4390
+2                                    2359             4390
+3                                    2359             4390
+4                                    2359             4390
+5                                    2359             4390
+6                                    2359             4390
+  White.alone..aged.0.17 Black.or.African.American.alone..aged.0.17
+1                   1942                                        338
+2                   1942                                        338
+3                   1942                                        338
+4                   1942                                        338
+5                   1942                                        338
+6                   1942                                        338
+  Hispanic.or.Latino..aged.0.17
+1                           988
+2                           988
+3                           988
+4                           988
+5                           988
+6                           988
+  Asian..Native.Hawaiian.and.Pacific.Islander.alone..aged.0.17
+1                                                          621
+2                                                          621
+3                                                          621
+4                                                          621
+5                                                          621
+6                                                          621
+  Other.Races.or.Multiple.Races..aged.0.17 household.population Total..2
+1                                      501                47916     4131
+2                                      501                47916     4131
+3                                      501                47916     4131
+4                                      501                47916     4131
+5                                      501                47916     4131
+6                                      501                47916     4131
+  Institutionalized.population. Correctional.facilities.for.adults
+1                           335                                  0
+2                           335                                  0
+3                           335                                  0
+4                           335                                  0
+5                           335                                  0
+6                           335                                  0
+  Juvenile.facilities Nursing.facilities.Skilled.nursing.facilities
+1                  13                                           266
+2                  13                                           266
+3                  13                                           266
+4                  13                                           266
+5                  13                                           266
+6                  13                                           266
+  Other.institutional.facilities Noninstitutionalized.population.
+1                             56                             3796
+2                             56                             3796
+3                             56                             3796
+4                             56                             3796
+5                             56                             3796
+6                             56                             3796
+  College.University.student.housing Military.quarters
+1                               3493                 0
+2                               3493                 0
+3                               3493                 0
+4                               3493                 0
+5                               3493                 0
+6                               3493                 0
+  Other.noninstitutional.facilities Total..3 Occupied Vacant household.size
+1                               303    23653    22535   1118       2.126292
+2                               303    23653    22535   1118       2.126292
+3                               303    23653    22535   1118       2.126292
+4                               303    23653    22535   1118       2.126292
+5                               303    23653    22535   1118       2.126292
+6                               303    23653    22535   1118       2.126292</code></pre>
+</div>
+</div>
 
 
 
