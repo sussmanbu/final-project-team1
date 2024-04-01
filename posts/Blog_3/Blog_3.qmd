@@ -1,5 +1,5 @@
 ---
-title: "Data Cleaning"
+title: "Blog 3: Data Cleaning"
 author: ""
 date: "2024-04-01"
 date-modified: "2024-04-01"
