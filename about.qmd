@@ -21,8 +21,10 @@ This is a website for the final project for MA\[46\]15 Data Science with R by Te
 
 ## Hirotaka Caden Fuiji
 
+Hiro is an undergraduate student majoring in Data Science. His GitHub Page is <https://github.com/fujiihc>
 ## John Markowicz
-John is an undergraduate student majoring in Data Science. His github page is https://github.com/jcmarkowicz
+
+John is an undergraduate student majoring in Data Science. His GitHub page is <https://github.com/jcmarkowicz>.
 
 ## Alexandra Rodriguez
 
