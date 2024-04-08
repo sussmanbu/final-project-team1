@@ -1,0 +1,16 @@
+{
+  "hash": "87a3267acee46eaef7a0afb417fe2a2f",
+  "result": {
+    "markdown": "---\ntitle: \"Blog4\"\neditor: visual\n---\n\n---\ntitle: \"Blog4\"\nformat: pdf\neditor: visual\n---\n\n\n\nTwo graphs we have emphasized are the relationship between victim and gender and incidents by district. Using these two graphs will help emphasize where Boston shootings most occur, and who is most at-risk in getting involved. Predictor variables we may be interested in are the district numbers and gender; these two variables are interesting to see where the greatest number of crimes occur - to observe possible patterns and for forecasting.\n\nOur analysis so far has highlighted gender differences and the frequency of incidents by district without exploring how these factors may interact with others. We could further explore temporal patterns to shed light on when incidents are more likely to occur. We could also focus on outcomes, particularly the distinction between fatal and non-fatal incidents, to help us understand the factors that contribute to the severity of shootings.\n\nBased on our dataset, there are two potential directions we can take for the choice of the response variable. We could predict the severity of incidents (whether it was fatal) or predict the frequency of incidents based on various factors (time, location, demographic information). To predict incident frequency, we would need to aggregate the data to have counts per day, district, or another relevant grouping. Possible predictor variables could include date/time for temporal trends, district name/district for geographical influences, victim race/gender for demographic factors of victims, or socioeconomic factors like income. If our response variable is the severity of incidents, logistic regression is the most appropriate for predicting the possibility of an incident being fatal based on the predictors. Linear regression could be used if our response variable is the number of incidents to fit a continuous distribution.\n\n\n\n\n\n\n\nsuppressWarnings(plot2)\n\n\n\n\\`\\`\\`\n\n![](images/Rplot.png)\n\n![](images/Rplot01.png)\n",
+    "supporting": [
+      "blog4_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
