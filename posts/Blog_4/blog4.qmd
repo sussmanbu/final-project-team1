@@ -1,5 +1,7 @@
 ---
-title: "Blog4"
+title: "Blog 4: Data Modeling"
+author: ""
+date: "2024-04-08"
 editor: visual
 ---
 
