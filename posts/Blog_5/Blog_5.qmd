@@ -1,6 +1,38 @@
 ---
-title: "Blog 4: Second Data Set"
+title: "Blog 5: Second Data Set"
 author: ""
 date: "2024-04-12"
 editor: visual
 ---
+
+Our team will be modeling the rate of shooting incidents in the Boston area from 2015-2024, and to build an accurate model, our team will be analyzing socioeconomic indicators to draw meaningful conclusions. To obtain variables that we think will have significant interactions with the outcome variable, we have decided to utilize the tidy census package to query data from the American Community Survey through Census.gov tables. Specifically, we are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied. To introduce spatial analysis, we have pulled demographic and geolocation data for each of the years to analyze the distribution of incidents across race in key Boston districts based on zip codes. The names of each variable and their primary key in the database are listed below. 
+
+After querying the relevant data, the next steps our team will take will involve merging the tables for each year with our initial data set. We plan on joining these tables based on year and zip code keys. Given that we are covering spatial data, we would like to model statistics such as diversity gradient and dissimilarity index across the different regions where incidents take place. We will also be producing map plots to demonstrate the difference in our dependent variable across the different regions of coverage. Additionally, the data is distributed over time, so our team will be able to analyze the temporal variance of incidents with a time series analysis. 
+
+Link to R script with query code: <https://github.com/sussmanbu/final-project-team1/blob/d0bbc5e22b53cb188ed9c0fa22820c64e190a2b6/tidycensus.R>
+
+Race variables:  White alone, Black alone, American Indian and Alaska Native alone, Asian alone, Native Hawaiian and Other Pacific Islander alone
+
+Variable IDs:
+
+‘DP03_0009’  unemployment rate
+
+‘B19013_001’ median income 
+
+B11005_003E single parent households
+
+'B16004_005E' percent of individuals who do no speak english at all 
+
+'B16004_004E' percent of individuals who do not speak english well 
+
+'B15003_017E' high school graduate population 
+
+'C24010\_'  Occupation by industry 
+
+'B23025_001E’ Employment status 
+
+'B17001_002E'  percent of individuals below poverty level 
+
+'B17001_003E' percent above poverty level 
+
+'DP04_0046PE'  percent of homes that are owner occupied
