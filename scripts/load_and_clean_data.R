@@ -1,11 +1,13 @@
+# This file is purely as an example. 
+# There are a few places
 
 library(tidyverse)
 
-shooting_data <- read_csv(here::here("dataset", "BostonShootingData.csv"))
+loan_data <- read_csv(here::here("dataset", "loan_refusal.csv"))
 
 ## CLEAN the data
-shooting_data_clean <- shooting_data
+loan_data_clean <- loan_data
 
-write_csv(shooting_data_clean, file = here::here("dataset", "BostonShootingDataClean.csv"))
+write_csv(loan_data_clean, file = here::here("dataset", "loan_refusal_clean.csv"))
 
-save(shooting_data_clean, file = here::here("dataset/BostonShootingDataClean.RData"))
+save(loan_data_clean, file = here::here("dataset/loan_refusal.RData"))
