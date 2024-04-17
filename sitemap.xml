@@ -1,59 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_post_2/Blog_post_2.html</loc>
-    <lastmod>2024-04-16T00:04:46.245Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_4/blog4.html</loc>
-    <lastmod>2024-04-16T00:04:44.673Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/2024-02-28-first-blog-post/first-blog-post.html</loc>
-    <lastmod>2024-04-16T00:04:42.488Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/2023-10-15-getting-started/getting-started.html</loc>
-    <lastmod>2024-04-16T00:04:40.090Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/index.html</loc>
-    <lastmod>2024-04-16T00:04:38.216Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/Blogpost5.html</loc>
-    <lastmod>2024-04-16T00:04:36.065Z</lastmod>
+    <loc>https://sussmanbu.github.io/final-project-team1/data.html</loc>
+    <lastmod>2024-04-17T18:36:55.367Z</lastmod>
   </url>
   <url>
     <loc>https://sussmanbu.github.io/final-project-team1/analysis.html</loc>
-    <lastmod>2024-04-16T00:04:34.865Z</lastmod>
+    <lastmod>2024-04-17T18:36:54.624Z</lastmod>
   </url>
   <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/about.html</loc>
-    <lastmod>2024-04-16T00:04:34.196Z</lastmod>
+    <loc>https://sussmanbu.github.io/final-project-team1/index.html</loc>
+    <lastmod>2024-04-17T18:36:53.975Z</lastmod>
   </url>
   <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/big_picture.html</loc>
-    <lastmod>2024-04-16T00:04:35.468Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/data.html</loc>
-    <lastmod>2024-04-16T00:04:36.850Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/2023-10-13-first-team-meeting/first-team-meeting.html</loc>
-    <lastmod>2024-04-16T00:04:39.120Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/2023-12-20-examples/examples.html</loc>
-    <lastmod>2024-04-16T00:04:41.642Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_3/Blog_3.html</loc>
-    <lastmod>2024-04-16T00:04:43.907Z</lastmod>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/2024-02-28-first-blog-post/first-blog-post.html</loc>
+    <lastmod>2024-04-17T18:36:52.921Z</lastmod>
   </url>
   <url>
     <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_5/Blog_5.html</loc>
-    <lastmod>2024-04-16T00:04:45.492Z</lastmod>
+    <lastmod>2024-04-17T18:36:52.283Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_3/Blog_3.html</loc>
+    <lastmod>2024-04-17T18:36:51.688Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/2023-10-15-getting-started/getting-started.html</loc>
+    <lastmod>2024-04-17T18:36:50.879Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/2023-10-13-first-team-meeting/first-team-meeting.html</loc>
+    <lastmod>2024-04-17T18:36:51.220Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_4/blog4.html</loc>
+    <lastmod>2024-04-17T18:36:51.971Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/Blog_post_2/Blog_post_2.html</loc>
+    <lastmod>2024-04-17T18:36:52.588Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/posts/2023-12-20-examples/examples.html</loc>
+    <lastmod>2024-04-17T18:36:53.422Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/about.html</loc>
+    <lastmod>2024-04-17T18:36:54.260Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sussmanbu.github.io/final-project-team1/big_picture.html</loc>
+    <lastmod>2024-04-17T18:36:54.983Z</lastmod>
   </url>
 </urlset>
