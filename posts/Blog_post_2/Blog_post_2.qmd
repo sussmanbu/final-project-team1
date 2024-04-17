@@ -1,9 +1,8 @@
-`---
+---
 title: "Blog 2: Data Background"
 author: ""
 date: "2024-03-18"
-date-modified: "2024-03-18"
-draft: FALSE
+editor: visual
 ---
 
 **Data Background**
