@@ -249,9 +249,14 @@ colnames(selected_columns)
 
 nrow(selected_columns)
 
-final_df<-merge(selected_columns,combined_table, by = c('district_name','year'), all.x = TRUE)
+final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
 
+write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
 
+colnames(final_df)
+unique(final_df$year)
+unique(selected_columns$year)
+unique(with_districts$year)
 
 brighton_zip<-02135
 dorchestor_zip<-c(02121, 02122, 02124, 02125)
