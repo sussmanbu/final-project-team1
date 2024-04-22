@@ -3,32 +3,20 @@ library(tidyverse)
 shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
 shooting_data <- mutate(shooting_data, year = year(Date))
 
-unique(shooting_data$district_name)
 
 census_api_key('edc88cbdb20f0ecb1fde3abf4e45a732dd998e96')
 
-brighton_zip<-02135
-dorchestor_zip<-c(02121, 02122, 02124, 02125)
-east_boston_zip< - 02128
-hyde_park <- 02136
-jamaica_plain <-02130
-Mattapan<-02126
-Roxbury<-c(02118,02119,02120,02132)
-south_boston<-02127
-south_end<-c(02111, 02116, 02118, 02119, 02120, 02127)
-West_Roxbury<-c(02132)
+
 
 vars<-load_variables(2017, "acs5", cache = TRUE)
 
 filter_vars<-vars %>%
   filter(str_detect(label, " one person"))
 
-
-
-
 zips<-c(2135,2121, 2122, 2124, 2125,2128,2136,2130,2126,2118,2119,2120,2132,2127,2111, 2116, 2118, 2119, 2120, 2127,2132)
 
 
+#get acs data for each year in our data set
 
 dat_2020<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",noenglish = 'B16004_005E',littleenglish = 'B16004_004E',
@@ -41,13 +29,14 @@ dat_2020<-get_acs(geography = 'zcta',
                   zip = "MA", 
                   year = 2020)
 
-
+#filter for zipcodes in collected list of zipcodes. Pivot so each variable has its own column
 df_2020<-dat_2020%>%
   mutate(GEOID = as.integer(GEOID))%>%
   filter(GEOID %in% zips)%>%
   select(-moe)%>%
   pivot_wider(names_from = variable, values_from = estimate)
   
+#add year column
 df_2020 <- df_2020 %>% mutate(year = 2020)
 
 
@@ -169,7 +158,9 @@ df_2015<-dat_2015%>%
 
 df_2015 <- df_2015 %>% mutate(year = 2015)
 
+#combine all the acs data into one table 
 combined_table <- bind_rows(df_2015, df_2016, df_2017,df_2018, df_2019, df_2020,df_2021)
+
 
 new_column_names<-c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
   has_highschool_diploma ="B15003_017E",employment_status = "B23025_001E",
@@ -178,6 +169,7 @@ new_column_names<-c(medincome = "B19013_001",no_english = "B16004_005E",little_e
   American_Indian_and_Alaska_Native_alone = "B02001_004E",Asian_alone = "B02001_005E", 
   Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P")
 
+#rename the census return variables
 df <- combined_table %>%
   rename(
     medincome = medincome,
@@ -198,6 +190,7 @@ df <- combined_table %>%
 
 colnames(df)
 
+#get original data set columns
 selected_columns <- shooting_data[, c(
   "district_name",
   "incident_num",
@@ -212,63 +205,53 @@ selected_columns <- shooting_data[, c(
   "Total."
 )]
 
-unique(selected_columns$district_name)
-
+#add year column to shooting dataset 
 selected_columns$year <- year(as.Date(selected_columns$Date))
 
-combined_table$year
-
-nrow(combined_table)
-nrow(selected_columns)
 
 
-print(names(df))
-df$NAME
-combined_table$GEOID
 
 zips<-c(02135,02121, 02122, 02124, 02125,02128,02136,02130,02126,02118,02119,02120,02132,02127,02111, 02116, 02118, 02119, 02120, 02127,02132)
 
+#add district names corresponding to zipcodes/Geoid for final merge with original dataset
 with_districts <- df %>%
   mutate(district_name = case_when(
     GEOID == 2135 ~ "Brighton",
-    GEOID %in% c(2121, 2122, 2124, 2125) ~ "Dorchestor",
+    GEOID %in% c(2121, 2122, 2124, 2125) ~ "Dorchester",
     GEOID == 2128 ~ "East Boston",
-    GEOID == 2136 ~ "Hyde Park",
-    GEOID == 2130 ~ "Jamaica Plain",
+    GEOID == c(2136,2137) ~ "Hyde Park",
+    GEOID == c(2130,2135) ~ "Jamaica Plain",
     GEOID == 2126 ~ "Mattapan",
-    GEOID %in% c(2118, 2119, 2120, 2132) ~ "Roxbury",
+    GEOID %in% c(2119,2120,2132) ~ "Roxbury",
     GEOID == 2127 ~ "South Boston",
-    GEOID %in% c(2111, 2116, 2118, 2119, 2120, 2127) ~ "South End",
+    GEOID %in% c(2111, 2116, 2118, 2127) ~ "South End",
     GEOID == 2132 ~ "West Roxbury",
     TRUE ~ NA_character_
   ))
 
 
-colnames(with_districts)
-colnames(selected_columns)
-
-nrow(selected_columns)
 
 final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
 
 write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
 
+
 colnames(final_df)
-unique(final_df$year)
-unique(selected_columns$year)
-unique(with_districts$year)
 
-brighton_zip<-02135
-dorchestor_zip<-c(02121, 02122, 02124, 02125)
-east_boston_zip< - 02128
-hyde_park <- 02136
-jamaica_plain <-02130
-Mattapan<-02126
-Roxbury<-c(02118,02119,02120,02132)
-south_boston<-02127
-south_end<-c(02111, 02116, 02118, 02119, 02120, 02127)
-West_Roxbury<-c(02132)
 
+#shows correlation between income and total cases for each district. Lower income => more cases 
+final_df%>%
+  filter(year == 2021)%>%
+  group_by(district_name)%>%
+  summarise(district_name=district_name,medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  distinct()%>%
+  ggplot(aes(district_name, medincome_mean,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+
+#update variables for these years 
 
 dat_2023<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
@@ -315,7 +298,7 @@ df_2024 <- dat_2024 %>%
 
 
 
-
+#List of variables and years for acs data 
 
 #2021 2018 2022 2020 2015 2019 2016 2023 2017 2024
 
@@ -335,4 +318,4 @@ zip_dat
 'DP04_0046PE' # percent of homes that are owner occupied 
 'DP02_0068P' # percent 25 and up with bachelors degree
 
-\
+
