@@ -1,0 +1,8 @@
+---
+title: "Blog 6: Thesis"
+author: ""
+date: "2024-04-22"
+editor: visual
+---
+
+Our thesis is as follows: Shooting Frequency is negatively correlated with Income Per Capita. As IPC increases, Shooting Frequency decreases. We have initial graphs that support this thesis. We decided to use Income Per Capita rather than median income to normalize our values to account for differing population sizes. We are in the process of exploring the relationships between Shooting Frequency and Employment Status as well as Education. Our initial assumptions are that low employment is correlated with more shootings, and that low education (defined as having a high school diploma) is correlated with more shootings. In terms of additional exploration, we are in the process of generating graphs to either verify or refute our previous claims. We aim to investigate the relationship between socioeconomic factors and the rate of shooting incidents in the Boston area over a ten-year period from 2015 to 2024. Our goal is to understand how variables such as employment status, poverty levels, unemployment rates, median income, family structure, education levels, and homeownership rates influence the occurrence of shooting incidents across different neighborhoods. We predict that certain factors such as high unemployment rates and elevated poverty levels will correlate with increased shooting incidents in the Boston area from 2015 to 2024. Tables we might look into include using tidycensus to get visual representations of where the most police shootings occur. This will help verify whether our hypothesis of shooting frequency and location is consistent.
