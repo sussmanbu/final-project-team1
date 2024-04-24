@@ -19,51 +19,152 @@ This comes from the file `data.qmd`.
 
 We used the tidycensus package to add census data from the American Community Survey to our original data set. We are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied. We have also pulled demographic data and geolocation data to help analyze the distribution of incidents across races between Boston districts. The data tables will be merged based on each year of our initial shooting data set.
 
-## What makes a good data set?
+Here is a slightly simplified version of the code we used to combine the tidycensus data with our original data set.
+```{r eval=FALSE}
+library(tidycensus)
+library(tidyverse)
+shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
+shooting_data <- mutate(shooting_data, year = year(Date))
 
--   Data you are interested in and care about.
--   Data where there are a lot of potential questions that you can explore.
--   A data set that isn't completely cleaned already.
--   Multiple sources for data that you can combine.
--   Some type of time and/or location component.
+census_api_key('edc88cbdb20f0ecb1fde3abf4e45a732dd998e96')
 
-## Where to keep data?
+vars<-load_variables(2017, "acs5", cache = TRUE)
 
-Below 50mb: In `dataset` folder
+filter_vars<-vars %>%
+  filter(str_detect(label, " one person"))
 
-Above 50mb: In `dataset_ignore` folder.
-This folder will be ignored by `git` so you'll have to manually sync these files across your team.
+zips<-c(2135,2121, 2122, 2124,...)
 
-### Sharing your data
 
-For small datasets (\<50mb), you can use the `dataset` folder that is tracked by github.
-Add the files just like you would any other file.
+#get acs data for each year in our data set
 
-If you create a folder named `data` this will cause problems.
+dat_2020<-get_acs(geography = 'zcta', 
+                  variables = c(medincome = "B19013_001",
+                                hashighschooldiploma ='B15003_017E',
+                                employmentstatus = 'B23025_001E',
+                                #etc...
+                              ),
+                  
+                  zip = "MA", 
+                  year = 2020)
 
-For larger datasets, you'll need to create a new folder in the project root directory named `dataset-ignore`.
-This will be ignored by git (based off the `.gitignore` file in the project root directory) which will help you avoid issues with Github's size limits.
-Your team will have to manually make sure the data files in `dataset-ignore` are synced across team members.
+#filter for zipcodes in collected list of zipcodes.
+#Pivot so each variable has its own column
+df_2020<-dat_2020%>%
+  mutate(GEOID = as.integer(GEOID))%>%
+  filter(GEOID %in% zips)%>%
+  select(-moe)%>%
+  pivot_wider(names_from = variable, values_from = estimate)
+  
+#add year column
+df_2020 <- df_2020 %>% mutate(year = 2020)
 
-Your [load_and_clean_data.R](/scripts/load_and_clean_data.R) file is how you will load and clean your data.
-Here is a an example of a very simple one.
 
-source( "scripts/load_and_clean_data.R", echo = TRUE \# Use echo=FALSE or omit it to avoid code output\
+dat_2021<-get_acs(geography = 'zcta', 
+                  variables = c(medincome = "B19013_001",
+                                employment_status = 'B23025_001E',
+                                #etc...
+                  
+                  zip = "MA", 
+                  year = 2021)
+
+
+df_2021<-dat_2021%>%
+  mutate(GEOID = as.integer(GEOID))%>%
+  filter(GEOID %in% zips)%>%
+  select(-moe)%>%
+  pivot_wider(names_from = variable, values_from = estimate)
+
+df_2021 <- df_2021 %>% mutate(year = 2021)
+
+## we repeat this process for each year to 2015
+
+
+#combine all the acs data into one table 
+combined_table <- bind_rows(df_2015, df_2016, 
+                            df_2017,df_2018, df_2019,
+                            df_2020,df_2021)
+
+
+new_column_names<-c(medincome = "B19013_001",employment_status = "B23025_001E",
+  pct_below_poverty_level = "B17001_002E", #etc...
 )
 
-You should never use absolute paths (eg. `/Users/danielsussman/path/to/project/` or `C:\MA415\\Final_Project\`).
+#rename the census return variables
+df <- combined_table %>%
+  rename(
+    medincome = medincome,
+    no_english = B16004_005,
+    little_english = B16004_004,
+    has_highschool_diploma = B15003_017,
+    employment_status = B23025_001,
+    pct_below_poverty_level = B17001_002,
+    pct_homes_owner_occupied = DP04_0046P,
+    total_pop = B02001_002,
+    White_alone = B02001_003,
+    Black_or_African_American_alone = B02001_004,
+    American_Indian_and_Alaska_Native_alone = B02001_005,
+    Asian_alone = B02001_006, 
+    Native_Hawaiian_and_Other_Pacific_Islander_alone
+    = DP04_0046P,
+    pct_25_and_up_bachelors_degree
+    = pct_25_and_up_bachelors_degree
+  )
 
-You might consider using the `here` function from the [`here` package](https://here.r-lib.org/articles/here.html) to avoid path problems.
+colnames(df)
 
-### Load and clean data script
+#get original data set columns
+selected_columns <- shooting_data[, c(
+  "district_name",
+  "incident_num",
+  "Date",
+  "Time",
+  "district",
+  "victim_gender",
+  "victim_race",
+  "multi_victim",
+  "v_hispanic_or_latinx",
+  "fatal",
+  "Total."
+)]
 
-The idea behind this file is that someone coming to your website could largely replicate your analyses after running this script on the original data sets to clean them.
-This file might create a derivative data set that you then use for your subsequent analysis.
-Note that you don't need to run this script from every post/page.
-Instead, you can load in the results of this script, which could be plain text files or `.RData` files.
-In your data page you'll describe how these results were created.
-If you have a very large data set, you might save smaller data sets that you can use for exploration purposes.
-To link to this file, you can use `[cleaning script](/scripts/load_and_clean_data.R)` wich appears as [cleaning script](/scripts/load_and_clean_data.R).
+#add year column to shooting dataset 
+selected_columns$year <- year(as.Date(selected_columns$Date))
+
+
+
+
+zips<-c(02135,02121, 02122, 02124, ...)
+
+#add district names corresponding to zipcodes/Geoid 
+#for final merge with original dataset
+with_districts <- df %>%
+  mutate(district_name = case_when(
+    GEOID == 2135 ~ "Brighton",
+    GEOID %in% c(2121, 2122, 2124, 2125) ~ "Dorchester",
+    GEOID == 2128 ~ "East Boston",
+    GEOID == c(2136,2137) ~ "Hyde Park",
+    GEOID == c(2130,2135) ~ "Jamaica Plain",
+    GEOID == 2126 ~ "Mattapan",
+    GEOID %in% c(2119,2120,2132) ~ "Roxbury",
+    GEOID == 2127 ~ "South Boston",
+    GEOID %in% c(2111, 2116, 2118, 2127) ~ "South End",
+    GEOID == 2132 ~ "West Roxbury",
+    TRUE ~ NA_character_
+  ))
+
+
+
+final_df<-merge(selected_columns,with_districts, by =
+                  c('district_name','year'))
+
+write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
+
+
+colnames(final_df)
+
+```
+
 
 ------------------------------------------------------------------------
 
@@ -78,7 +179,7 @@ You will
     -   If you have many variables then only describe the most relevant ones and summarize the rest.
 -   Describe any cleaning you had to do for your data.
     -   You *must* include a link to your `load_and_clean_data.R` file.
-    -   Rrename variables and recode factors to make data more clear.
+    -   Rename variables and recode factors to make data more clear.
     -   Also, describe any additional R packages you used outside of those covered in class.
     -   Describe and show code for how you combined multiple data files and any cleaning that was necessary for that.
     -   Some repetition of what you do in your `load_and_clean_data.R` file is fine and encouraged if it helps explain what you did.
