@@ -123,7 +123,14 @@
     "href": "about.html#hirotaka-caden-fuiji",
     "title": "About",
     "section": "Hirotaka Caden Fuiji",
-    "text": "Hirotaka Caden Fuiji\nHiro is an undergraduate student majoring in Data Science. His GitHub Page is https://github.com/fujiihc ## John Markowicz\nJohn is an undergraduate student majoring in Data Science. His GitHub page is https://github.com/jcmarkowicz."
+    "text": "Hirotaka Caden Fuiji\nHiro is an undergraduate student majoring in Data Science. His GitHub Page is https://github.com/fujiihc."
+  },
+  {
+    "objectID": "about.html#john-markowicz",
+    "href": "about.html#john-markowicz",
+    "title": "About",
+    "section": "John Markowicz",
+    "text": "John Markowicz\nJohn is an undergraduate student majoring in Data Science. His GitHub page is https://github.com/jcmarkowicz."
   },
   {
     "objectID": "about.html#alexandra-rodriguez",
@@ -144,7 +151,7 @@
     "href": "about.html#eric-yang",
     "title": "About",
     "section": "Eric Yang",
-    "text": "Eric Yang\nEric is an undergraduate student in Economics with a minor in History. His Github page is https://github.com/ericyang02."
+    "text": "Eric Yang\nEric is an undergraduate student in Economics with a minor in History. His Github page is https://github.com/ericyang02.\n\n\nAbout this Template.\nThis is based off of the standard Quarto website template from RStudio (2023.09.0 Build 463)."
   },
   {
     "objectID": "big_picture.html",
