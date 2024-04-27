@@ -1,0 +1,155 @@
+---
+title: "Analysis page"
+editor: visual
+---
+
+```         
+library(tidyverse)
+library(sandwich)
+library(lmtest)
+library(car)
+final_df<-read.csv('census_dat.csv')
+
+#shows correlation between income and total cases for each district. Lower income => more cases 
+
+#income plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(total_cases, medincome_mean),2))
+
+final_df%>%
+  group_by(district_name)%>%
+  select(year, district_name, medincome, incident_num)%>%
+  summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  distinct()%>%
+  ggplot(aes(district_name, medincome_mean,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+#scatterplot with line of best fit 
+final_df%>%
+  group_by(district_name)%>%
+  select(year, district_name, medincome, incident_num)%>%
+  summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  distinct()%>%
+  ggplot(aes( medincome_mean,total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')+
+  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+
+
+#Highschool plot
+final_df%>%
+  group_by(district_name)%>%
+  select(year, district_name, has_highschool_diploma, Total.,incident_num)%>%
+  summarise(district_name=district_name,high_school_pct= mean(has_highschool_diploma/Total.), total_cases = sum(!duplicated(incident_num))) %>%
+  distinct()%>%
+  ggplot(aes(district_name, high_school_pct,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Pct of population with high school diploma',title = 'Avg Populaion with HS Diploma and Total Cases Over All Years')
+
+
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(employment_pct= mean(employment_status/Total.), total_cases = sum(!duplicated(incident_num)))%>%
+  summarise(correlation_coef = round(cor(total_cases, employment_pct),2))
+
+#employment plot
+final_df%>%
+  group_by(district_name)%>%
+  summarise(employment_pct= mean(employment_status/Total.), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, employment_pct,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Pct of population employed',title = 'Avg Employment pct and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+#total cases for districts plot
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name,total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title = 'Total Cases by District')
+
+#single parent household plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(single_household = mean(single_parent_household_under_18/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(single_household, total_cases),2))
+final_df%>%
+  group_by(district_name)%>%
+  summarise(single_household = mean(single_parent_household_under_18/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name,single_household, fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title = 'Pct of Households with Single Parent')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+
+
+
+#poverty level plot
+final_df%>%
+  group_by(district_name)%>%
+  summarise(pct_below_poverty_level= mean(pct_below_poverty_level/Total.), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, pct_below_poverty_level,fill = total_cases))+
+  geom_bar(stat='identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')
+
+
+
+
+
+lm_dat<-final_df%>%
+  group_by(district_name, year)%>%
+  summarise(no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
+            pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
+            mean_high_school_pct =mean(has_highschool_diploma/Total.), employment_pct = mean(employment_status/Total.),
+            total_cases = sum(!duplicated(incident_num)),single_household = mean(single_parent_household_under_18/ Total.))
+
+
+ols<-lm(total_cases~ district_name+ medincome_mean+ pct_below_poverty_level+employment_pct, data = lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols) #92 adjusted Rsquared good for forecasting
+vif(ols)
+#interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity
+#vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
+
+
+ols<-lm(total_cases~medincome_mean+employment_pct+single_household+pct_below_poverty_level, data = lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols)
+vif(ols)
+#interpretation these variables are highly collinear, signs of the coefficients do not make sense 
+#however as single households increases, cases increas,
+#as employment pct increases, cases decrease
+#check signs of estimates
+
+#check these plots for residuals, QQ, outliers
+plot(ols)
+
+
+logit_dat<-final_df%>%
+  group_by(district_name, year,victim_gender)%>%
+  summarise(victim_gender =victim_gender, no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
+            pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
+            mean_high_school_pct =mean(has_highschool_diploma/Total.), employment_pct = mean(employment_status/Total.),
+            total_cases = sum(!duplicated(incident_num)),single_household = mean(single_parent_household_under_18/ Total.))%>%
+  distinct()
+
+#logistic regression to predict victims gender, residuals highly heteroskedastic, 
+logit <- glm(factor(victim_gender) ~ employment_pct+ pct_below_poverty_level+mean_high_school_pct+ medincome_mean, data = logit_dat, family = binomial)
+coeftest(logit, vcov.=vcovHC)#heteroskedastic standard errors
+summary(logit)#homoskedasitic standard erros formula, pvalues much higher 
+
+```

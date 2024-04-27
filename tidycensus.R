@@ -9,9 +9,8 @@ census_api_key('edc88cbdb20f0ecb1fde3abf4e45a732dd998e96')
 
 
 vars<-load_variables(2017, "acs5", cache = TRUE)
-
-filter_vars<-vars %>%
-  filter(str_detect(label, " one person"))
+vars %>%
+  filter(str_detect(label, " poverty count"))
 
 zips<-c(2135,2121, 2122, 2124, 2125,2128,2136,2130,2126,2118,2119,2120,2132,2127,2111, 2116, 2118, 2119, 2120, 2127,2132)
 
@@ -28,6 +27,7 @@ dat_2020<-get_acs(geography = 'zcta',
                   
                   zip = "MA", 
                   year = 2020)
+
 
 #filter for zipcodes in collected list of zipcodes. Pivot so each variable has its own column
 df_2020<-dat_2020%>%
@@ -46,7 +46,7 @@ dat_2021<-get_acs(geography = 'zcta',
                                 pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
                                 total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
                   
                   zip = "MA", 
                   year = 2021)
@@ -67,7 +67,7 @@ dat_2018<-get_acs(geography = 'zcta',
                                 pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
                                 total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
                   
                   zip = "MA", 
                   year = 2018)
@@ -86,7 +86,7 @@ dat_2019<-get_acs(geography = 'zcta',
                                 pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
                                 total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
                   
                   zip = "MA", 
                   year = 2019)
@@ -106,7 +106,7 @@ dat_2017<-get_acs(geography = 'zcta',
                                 pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
                                 total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
                   
                   zip = "MA", 
                   year = 2017)
@@ -126,7 +126,7 @@ dat_2016<-get_acs(geography = 'zcta',
                                 pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
                                 total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
                   
                   zip = "MA", 
                   year = 2016)
@@ -145,7 +145,7 @@ dat_2015<-get_acs(geography = 'zcta',
                                 pct_below_poverty_level = "B17001_002E",pct_homes_owner_occupied = "DP04_0046PE",
                                 total_pop = "B02001_002E", White_alone = "B02001_002E", Black_or_African_American_alone = "B02001_003E",
                                 American_Indian_and_Alaska_Native_alone = "B02001_004E",Asian_alone = "B02001_005E", 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P"),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P",single_parent_household_under_18 = 'B11005_003E'),
                   
                   zip = "MA", 
                   year = 2015)
@@ -167,7 +167,7 @@ new_column_names<-c(medincome = "B19013_001",no_english = "B16004_005E",little_e
   pct_below_poverty_level = "B17001_002E",pct_homes_owner_occupied = "DP04_0046PE",
   total_pop = "B02001_002E", White_alone = "B02001_002E", Black_or_African_American_alone = "B02001_003E",
   American_Indian_and_Alaska_Native_alone = "B02001_004E",Asian_alone = "B02001_005E", 
-  Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P")
+  Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P",single_parent_household_under_18 = 'B11005_003E')
 
 #rename the census return variables
 df <- combined_table %>%
@@ -185,7 +185,8 @@ df <- combined_table %>%
     American_Indian_and_Alaska_Native_alone = B02001_005,
     Asian_alone = B02001_006, 
     Native_Hawaiian_and_Other_Pacific_Islander_alone = DP04_0046P,
-    pct_25_and_up_bachelors_degree = pct_25_and_up_bachelors_degree
+    pct_25_and_up_bachelors_degree = pct_25_and_up_bachelors_degree,
+    single_parent_household_under_18 = B11005_003
   )
 
 colnames(df)
@@ -230,7 +231,6 @@ with_districts <- df %>%
   ))
 
 
-
 final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
 
 write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
@@ -239,15 +239,155 @@ write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
 colnames(final_df)
 
 
+library(tidyverse)
+library(sandwich)
+library(lmtest)
+library(car)
+final_df<-read.csv('census_dat.csv')
+
 #shows correlation between income and total cases for each district. Lower income => more cases 
-final_df%>%
-  filter(year == 2021)%>%
+
+#income plot
+correlation_coef <- final_df%>%
   group_by(district_name)%>%
-  summarise(district_name=district_name,medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(total_cases, medincome_mean),2))
+
+final_df%>%
+  group_by(district_name)%>%
+  select(year, district_name, medincome, incident_num)%>%
+  summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
   distinct()%>%
   ggplot(aes(district_name, medincome_mean,fill = total_cases))+
   geom_bar(stat= 'identity')+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+#scatterplot with line of best fit 
+final_df%>%
+  group_by(district_name)%>%
+  select(year, district_name, medincome, incident_num)%>%
+  summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  distinct()%>%
+  ggplot(aes( medincome_mean,total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')+
+  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+
+
+#Highschool plot
+final_df%>%
+  group_by(district_name)%>%
+  select(year, district_name, has_highschool_diploma, Total.,incident_num)%>%
+  summarise(district_name=district_name,high_school_pct= mean(has_highschool_diploma/Total.), total_cases = sum(!duplicated(incident_num))) %>%
+  distinct()%>%
+  ggplot(aes(district_name, high_school_pct,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Pct of population with high school diploma',title = 'Avg Populaion with HS Diploma and Total Cases Over All Years')
+
+
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(employment_pct= mean(employment_status/Total.), total_cases = sum(!duplicated(incident_num)))%>%
+  summarise(correlation_coef = round(cor(total_cases, employment_pct),2))
+
+#employment plot
+final_df%>%
+  group_by(district_name)%>%
+  summarise(employment_pct= mean(employment_status/Total.), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, employment_pct,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Pct of population employed',title = 'Avg Employment pct and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+#total cases for districts plot
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name,total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title = 'Total Cases by District')
+
+#single parent household plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(single_household = mean(single_parent_household_under_18/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(single_household, total_cases),2))
+final_df%>%
+  group_by(district_name)%>%
+  summarise(single_household = mean(single_parent_household_under_18/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name,single_household, fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title = 'Pct of Households with Single Parent')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+
+
+
+#poverty level plot
+final_df%>%
+  group_by(district_name)%>%
+  summarise(pct_below_poverty_level= mean(pct_below_poverty_level/Total.), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, pct_below_poverty_level,fill = total_cases))+
+  geom_bar(stat='identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')
+
+
+
+
+
+lm_dat<-final_df%>%
+  group_by(district_name, year)%>%
+  summarise(no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
+            pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
+            mean_high_school_pct =mean(has_highschool_diploma/Total.), employment_pct = mean(employment_status/Total.),
+            total_cases = sum(!duplicated(incident_num)),single_household = mean(single_parent_household_under_18/ Total.))
+
+
+ols<-lm(total_cases~ district_name+ medincome_mean+ pct_below_poverty_level+employment_pct, data = lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols) #92 adjusted Rsquared good for forecasting
+vif(ols)
+#interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity
+#vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
+
+
+ols<-lm(total_cases~medincome_mean+employment_pct+single_household+pct_below_poverty_level, data = lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols)
+vif(ols)
+#interpretation these variables are highly collinear, signs of the coefficients do not make sense 
+#however as single households increases, cases increas,
+#as employment pct increases, cases decrease
+#check signs of estimates
+
+#check these plots for residuals, QQ, outliers
+plot(ols)
+
+
+logit_dat<-final_df%>%
+  group_by(district_name, year,victim_gender)%>%
+  summarise(victim_gender =victim_gender, no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
+            pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
+            mean_high_school_pct =mean(has_highschool_diploma/Total.), employment_pct = mean(employment_status/Total.),
+            total_cases = sum(!duplicated(incident_num)),single_household = mean(single_parent_household_under_18/ Total.))%>%
+  distinct()
+
+#logistic regression to predict victims gender, residuals highly heteroskedastic, 
+logit <- glm(factor(victim_gender) ~ employment_pct+ pct_below_poverty_level+mean_high_school_pct+ medincome_mean, data = logit_dat, family = binomial)
+coeftest(logit, vcov.=vcovHC)#heteroskedastic standard errors
+summary(logit)#homoskedasitic standard erros formula, pvalues much higher 
+
+
 
 
 
