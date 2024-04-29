@@ -1,0 +1,14 @@
+---
+title: "Blog 7: Visualizations"
+author: ""
+date: "2024-04-29"
+date-modified: "2024-04-29"
+draft: FALSE
+---
+
+For additional graphs and tables, we may want to observe how the scale of these crime patterns may differ based on different combinations of factors. This may help emphasize which factors - median income, family structure, education levels, and homeownership rates - influence the occurrence of shooting incidents the most. 
+We may want to emphasize the earlier years (such as 2015 - 2020), as doing so may help provide insights on how such patterns evolved, as well as helping us predict where future shootings may occur. We may also observe how factors such as population (density) affects how often there is a shooting in a particular area, as there may be more instances of shootings in areas with more people of a lower socioeconomic background. The variable of interest, income per capita, helps predict future patterns.
+
+Depending on the frequencies, plotly() may be useful in determining the relative frequencies of shootings based on data [Using this graph will specifically help visualize which Boston districts experience the most and least number of shootings depending ] Furthermore, packages of interest to make these plots may include ‘dplyr’. We are working on developing maps to display the distribution of demographic data over the districts for which we collected data. Following the tidycensus online text, we will plot maps for our statistically significant independent variables and incorporate our demographic data with the segregation package to map the local segregation index.
+
+We are developing four models, OLS with observations for each year in our dataset, logistic regression to analyze the victim gender in each incident, a geographical weighted regression to consider the effects of neighboring locations, and an ADL time series regression to forecast incidents in 2025.  Additionally, we will include scatterplots to display the interactions between statistically significant independent variables against our outcome variable. 
