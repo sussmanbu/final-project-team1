@@ -1,9 +1,10 @@
 ---
 title: "Blog 7: Visualizations"
-author: ""
+author: "Hirotaka Caden Fuiji, John Markowicz, Alexandra Rodriguez, Nathan Rosenblum, Eric Yang"
 date: "2024-04-29"
 date-modified: "2024-04-29"
 draft: FALSE
+description: In this blog post, we discuss the potential use of additional graphs and tables to observe crime patterns based on different combinations of factors such as median income, family structure, education levels, and homeownership rates, with a focus on earlier years (2015 - 2020) to understand evolving patterns and predict future occurrences, as well as the development of models including OLS, logistic regression, geographical weighted regression, and ADL time series regression to analyze and forecast shooting incidents in Boston.
 ---
 
 For additional graphs and tables, we may want to observe how the scale of these crime patterns may differ based on different combinations of factors. This may help emphasize which factors - median income, family structure, education levels, and homeownership rates - influence the occurrence of shooting incidents the most. 

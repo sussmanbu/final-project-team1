@@ -1,9 +1,10 @@
 ---
 title: "Blog 3: Data Cleaning"
-author: ""
+author: "Hirotaka Caden Fuiji, John Markowicz, Alexandra Rodriguez, Nathan Rosenblum, Eric Yang"
 date: "2024-04-01"
 date-modified: "2024-04-01"
 draft: FALSE
+description: In this blog post, we detail the process of cleaning the Boston shooting dataset, including simplifying column names, categorizing values, handling duplicates, and integrating demographic information, while also discussing principles of equity in data analysis such as beneficence and transparency.
 ---
 
 **Blog Post 3: Data Cleaning**
@@ -22,6 +23,7 @@ library(DT)
 shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
 datatable(shooting_data, options = list(scrollX = TRUE))
 ```
+
 
 **Data for Equity**
 

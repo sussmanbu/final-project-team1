@@ -1,8 +1,9 @@
 ---
 title: "Blog 5: Second Data Set"
-author: ""
+author: "Hirotaka Caden Fuiji, John Markowicz, Alexandra Rodriguez, Nathan Rosenblum, Eric Yang"
 date: "2024-04-12"
 editor: visual
+description: In this blog post, we outline our approach to modeling the rate of shooting incidents in Boston from 2015 to 2024, discussing the analysis of socioeconomic indicators and spatial data, including querying relevant variables, merging tables, and conducting spatial and time series analyses.
 ---
 
 Our team will be modeling the rate of shooting incidents in the Boston area from 2015-2024, and to build an accurate model, our team will be analyzing socioeconomic indicators to draw meaningful conclusions. To obtain variables that we think will have significant interactions with the outcome variable, we have decided to utilize the tidy census package to query data from the American Community Survey through Census.gov tables. Specifically, we are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied. To introduce spatial analysis, we have pulled demographic and geolocation data for each of the years to analyze the distribution of incidents across race in key Boston districts based on zip codes. The names of each variable and their primary key in the database are listed below. 

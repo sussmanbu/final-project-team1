@@ -1,8 +1,9 @@
 ---
 title: "Blog 4: Data Modeling"
-author: ""
+author: "Hirotaka Caden Fuiji, John Markowicz, Alexandra Rodriguez, Nathan Rosenblum, Eric Yang"
 date: "2024-04-08"
 editor: visual
+description: In this blog post, we discuss the utilization of graphs to highlight the frequency of Boston shootings by district and victim gender, potential predictor variables such as district numbers and gender, and potential directions for analysis including exploring temporal patterns, outcomes, and choices for response variables such as incident severity or frequency.
 ---
 
 Two graphs we have emphasized are the relationship between victim and gender and incidents by district. Using these two graphs will help emphasize where Boston shootings most occur, and who is most at-risk in getting involved. Predictor variables we may be interested in are the district numbers and gender; these two variables are interesting to see where the greatest number of crimes occur - to observe possible patterns and for forecasting.
