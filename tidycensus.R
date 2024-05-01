@@ -43,6 +43,10 @@ print(search, n=700)
 #Asian_alone = 'B02001_005'
 #pct_25_and_up_bachelors_degree = 'DP02_0068P'
 
+
+#B08131	Aggregate Travel Time to Work (In Minutes) of Workers by
+#B23020	Mean Usual Hours Worked for Workers 16 to 64 Years
+
 dat_2022<-get_acs(geography = 'zcta', 
                   variables = c(total_house_units = 'B25001_001',non_married_household = 'B11001A_004', bacehelors_25 = 'B15003_022', one_parent = 'B23008_021', married_households='B11001A_003', income_deficit = 'B17011_001', medincome = "B19013_001",
                                 not_enrolled_school ='B14001_010',not_in_labor_force = 'B23025_007',
@@ -248,6 +252,7 @@ library(tidyverse)
 library(sandwich)
 library(lmtest)
 library(car)
+library(leaps)
 final_df<-read.csv('census_dat.csv')
 
 #shows correlation between income and total cases for each district. Lower income => more cases 
@@ -272,9 +277,7 @@ final_df%>%
 #scatterplot with line of best fit 
 final_df%>%
   group_by(district_name)%>%
-  select(year, district_name, medincome, incident_num)%>%
   summarise(medincome_mean= mean(medincome), total_cases = sum(!duplicated(incident_num))) %>%
-  distinct()%>%
   ggplot(aes( medincome_mean,total_cases))+
   geom_point()+
   geom_smooth(method ='lm')+
@@ -296,6 +299,13 @@ final_df%>%
   labs(y = 'Pct of population with high school diploma',title = 'Avg Populaion with HS Diploma and Total Cases Over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
+final_df%>%
+  group_by(district_name)%>%
+  summarise(pct_not_enrolled= mean(bacehelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(pct_not_enrolled, total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')
+
 
 #not in labor force plot
 
@@ -312,6 +322,19 @@ final_df%>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(y = 'Pct of population employed',title = 'Avg Employment pct and Total Cases Over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(unemployment_pct= mean(not_in_labor_force/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(unemployment_pct, total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(unemployment_pct= mean(not_in_labor_force/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(unemployment_pct))+
+  geom_histogram()
 
 #total cases for districts plot
 final_df%>%
@@ -337,6 +360,13 @@ final_df%>%
   labs(title = 'Pct of Households with Single Parent')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
+final_df%>%
+  group_by(district_name)%>%
+  summarise(single_household = mean(one_parent/ total_pop),total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(single_household, total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')
+
 
 #married househomes
 correlation_coef <- final_df%>%
@@ -353,50 +383,73 @@ final_df%>%
   labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
+final_df%>%
+  group_by(district_name)%>%
+  summarise(married_house_pct= mean(married_households/total_house_units), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(married_house_pct, total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')
+
 #vacant househomes
 
 correlation_coef <- final_df%>%
   group_by(district_name)%>%
-  summarise(married_house = mean(vacancy_status/total_house_units),total_cases = sum(!duplicated(incident_num))) %>%
-  summarise(correlation_coef = round(cor(married_house, total_cases),2))
+  summarise(vaccant_house = mean(vacancy_status/total_house_units),total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(vaccant_house, total_cases),2))
 
 final_df%>%
   group_by(district_name)%>%
-  summarise(married_house_pct= mean(vacancy_status/total_house_units), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(district_name, married_house_pct,fill = total_cases))+
+  summarise(vaccant_house_pct= mean(vacancy_status/total_house_units), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, vaccant_house_pct,fill = total_cases))+
   geom_bar(stat='identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
+final_df%>%
+  group_by(district_name)%>%
+  summarise(vaccant_house_pct= mean(vacancy_status/total_house_units), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(vaccant_house_pct, total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')
 
 
 
+
+library(olsrr)
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  summarise(
-            pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
-            employment_pct = mean(employment_status/Total.),
-            total_cases = sum(!duplicated(incident_num)),single_household = mean(one_parent/ Total.))
+  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
+            total_cases = sum(!duplicated(incident_num)))
 
-ols<-lm(total_cases~ district_name+ medincome_mean+ pct_below_poverty_level+employment_pct, data = lm_dat)
+ols<-lm(total_cases~ district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols) #92 adjusted Rsquared good for forecasting
 vif(ols)
+ols_step_all_possible(ols)
+ols_step_forward_p(ols)
+ols_step_backward_p(ols)
 #interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity
 #vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
 
-ols<-lm(total_cases~medincome_mean+single_household+pct_below_poverty_level, data = lm_dat)
+I(age^2)
+ols<-lm(total_cases~+ unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
 vif(ols)
-#interpretation these variables are highly collinear, signs of the coefficients do not make sense 
-#however as single households increases, cases increas,
-#as employment pct increases, cases decrease
-#check signs of estimates
+ols_step_forward_p(ols)
+ols_step_backward_p(ols)
 
-#check these plots for residuals, QQ, outliers
+
 plot(ols)
+
+
+#time series forecast:
+
+
+
+
 
 logit_dat<-final_df%>%
   group_by(district_name, year,victim_gender)%>%
@@ -416,6 +469,8 @@ summary(logit)#homoskedasitic standard erros formula, pvalues much higher
 
 
 #update variables for these years 
+
+
 
 dat_2023<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
@@ -461,24 +516,6 @@ df_2024 <- dat_2024 %>%
 
 
 
-#List of variables and years for acs data 
 
-#2021 2018 2022 2020 2015 2019 2016 2023 2017 2024
-
-
-little_english = 'B16004_004E',
-has_highschool_diploma ='B15003_017E',occoupation ='C24010_',employment_status = 'B23025_001E',
-pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE'
-zip_dat
-
-'B16004_005E'#percent of individuals who do no speak english at all 
-'B16004_004E'# percent of individuals who do not speak english well 
-'B15003_017E'#high school graduate population 
-'C24010_'# Occupation by industry 
-'B23025_001E'#Employment status 
-'B17001_002E'# percent of individuals below poverty level 
-'B17001_003E'#percent above poverty level 
-'DP04_0046PE' # percent of homes that are owner occupied 
-'DP02_0068P' # percent 25 and up with bachelors degree
 
 
