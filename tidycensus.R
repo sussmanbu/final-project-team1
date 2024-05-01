@@ -7,26 +7,35 @@ census_api_key('edc88cbdb20f0ecb1fde3abf4e45a732dd998e96')
 
 
 
-vars<-load_variables(2022, "acs1", cache = TRUE)
-search<-vars %>%
-  filter(str_detect(name,'B06012002'))
-
-print(search, n=100)
-
 zips<-c(2135,2121, 2122, 2124, 2125,2128,2136,2130,2126,2118,2119,2120,2132,2127,2111, 2116, 2118, 2119, 2120, 2127,2132)
 
+#Websites to help query: https://censusreporter.org/topics/table-codes/
+#https://data.census.gov/table/ACSST5Y2022.S1501?q=high%20school&g=1400000US48201553300
 
-#C15002A003, pop without highschool diploma
-#B06012002 below 100% poverty level 
-#B01003_001 total population
-#B23025_007 Estimate!!Total:!!Not in labor force
+#tables: Employment status: B23025
+
+#variables: 
+# B06012_002 below 100% poverty level 
+# B01003_001 total population
+# B23025_007 Estimate!!Total:!!Not in labor force
 # B25004_001 total vacancy 
 # B23008_021 Estimate!!Total!!6 to 17 years!!Living with one parent    
-#B16010002 less than highschool diploma
+# B14001_010 Estimate!!Total:!!Not enrolled in school School Enrollment by Level of School for the Population 3 Years and Over
+
+
+vars<-load_variables(2022, "acs1", cache = TRUE)
+search<-vars %>%
+  filter(str_detect(label,'high school'))
+print(search, n=100)
+
+vars<-load_variables(2022, "acs1", cache = TRUE)
+search<-vars %>%
+  filter(str_detect(name,'B25004'))
+print(search, n=100)
 
 dat_2022<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                has_highschool_diploma ='B16010_002',not_in_labor_force = 'B23025_007',
                                 pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
                                 total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
@@ -40,7 +49,6 @@ df_2022<-dat_2022%>%
   select(-moe)%>%
   pivot_wider(names_from = variable, values_from = estimate)
 df_2022 <- df_2022 %>% mutate(year = 2022)
-
 
 
 dat_2021<-get_acs(geography = 'zcta', 
@@ -355,8 +363,6 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 
-
-
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
   summarise(
@@ -364,14 +370,12 @@ lm_dat<-final_df%>%
             employment_pct = mean(employment_status/Total.),
             total_cases = sum(!duplicated(incident_num)),single_household = mean(one_parent/ Total.))
 
-
 ols<-lm(total_cases~ district_name+ medincome_mean+ pct_below_poverty_level+employment_pct, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols) #92 adjusted Rsquared good for forecasting
 vif(ols)
 #interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity
 #vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
-
 
 ols<-lm(total_cases~medincome_mean+single_household+pct_below_poverty_level, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
@@ -424,18 +428,17 @@ df_2023<- dat_2023 %>%
   ) %>%
   mutate(year = 2023)
 
+
 dat_2024<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001", no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B15003_017E',employment_status = 'B23025_001E',
-                                pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P'),
-                  
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
+                
                   zip = "MA", 
                   year = 2024)
-
-
 
 
 df_2024 <- dat_2024 %>%
