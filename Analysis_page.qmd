@@ -3,7 +3,7 @@ title: "Analysis page"
 editor: visual
 ---
 
-```         
+``` {r}        
 library(tidyverse)
 library(sandwich)
 library(lmtest)
@@ -151,5 +151,4 @@ logit_dat<-final_df%>%
 logit <- glm(factor(victim_gender) ~ employment_pct+ pct_below_poverty_level+mean_high_school_pct+ medincome_mean, data = logit_dat, family = binomial)
 coeftest(logit, vcov.=vcovHC)#heteroskedastic standard errors
 summary(logit)#homoskedasitic standard erros formula, pvalues much higher 
-
 ```

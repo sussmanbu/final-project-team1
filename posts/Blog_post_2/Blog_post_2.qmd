@@ -1,8 +1,9 @@
 ---
 title: "Blog 2: Data Background"
-author: ""
+author: "Hirotaka Caden Fuiji, John Markowicz, Alexandra Rodriguez, Nathan Rosenblum, Eric Yang"
 date: "2024-03-18"
 editor: visual
+description: In this post, we discuss the Boston shooting dataset, covering its collection, potential biases, and how it can help understand safety and violence in the city.
 ---
 
 **Data Background**

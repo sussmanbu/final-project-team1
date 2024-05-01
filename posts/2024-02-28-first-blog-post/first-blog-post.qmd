@@ -1,9 +1,10 @@
 ---
 title: "Blog 1: Dataset Proposal"
-author: ""
+author: "Hirotaka Caden Fuiji, John Markowicz, Alexandra Rodriguez, Nathan Rosenblum, Eric Yang"
 date: "2024-02-28"
 date-modified: "2024-02-28"
 draft: FALSE
+description: In this blog post, we explore three diverse datasets including Boston shootings, tobacco use trends, and school attendance patterns, each offering unique insights into societal issues and demographic dynamics.
 ---
 
 **Dataset 1 - Analyze Boston Shootings**
