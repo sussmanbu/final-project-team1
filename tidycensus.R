@@ -3,27 +3,72 @@ library(tidyverse)
 shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
 shooting_data <- mutate(shooting_data, year = year(Date))
 
-
 census_api_key('edc88cbdb20f0ecb1fde3abf4e45a732dd998e96')
 
 
 
-vars<-load_variables(2017, "acs5", cache = TRUE)
-vars %>%
-  filter(str_detect(label, " poverty count"))
+vars<-load_variables(2022, "acs1", cache = TRUE)
+search<-vars %>%
+  filter(str_detect(name,'B06012002'))
+
+print(search, n=100)
 
 zips<-c(2135,2121, 2122, 2124, 2125,2128,2136,2130,2126,2118,2119,2120,2132,2127,2111, 2116, 2118, 2119, 2120, 2127,2132)
 
 
-#get acs data for each year in our data set
+#C15002A003, pop without highschool diploma
+#B06012002 below 100% poverty level 
+#B01003_001 total population
+#B23025_007 Estimate!!Total:!!Not in labor force
+# B25004_001 total vacancy 
+# B23008_021 Estimate!!Total!!6 to 17 years!!Living with one parent    
+#B16010002 less than highschool diploma
+
+dat_2022<-get_acs(geography = 'zcta', 
+                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
+                  zip = "MA", 
+                  year = 2022)
+
+df_2022<-dat_2022%>%
+  mutate(GEOID = as.integer(GEOID))%>%
+  filter(GEOID %in% zips)%>%
+  select(-moe)%>%
+  pivot_wider(names_from = variable, values_from = estimate)
+df_2022 <- df_2022 %>% mutate(year = 2022)
+
+
+
+dat_2021<-get_acs(geography = 'zcta', 
+                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
+                  
+                  zip = "MA", 
+                  year = 2021)
+
+df_2021<-dat_2021%>%
+  mutate(GEOID = as.integer(GEOID))%>%
+  filter(GEOID %in% zips)%>%
+  select(-moe)%>%
+  pivot_wider(names_from = variable, values_from = estimate)
+
+df_2021 <- df_2021 %>% mutate(year = 2021)
 
 dat_2020<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",noenglish = 'B16004_005E',littleenglish = 'B16004_004E',
-                                hashighschooldiploma ='B15003_017E',employmentstatus = 'B23025_001E',
-                                pctbelowpoverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
                   
                   zip = "MA", 
                   year = 2020)
@@ -39,54 +84,13 @@ df_2020<-dat_2020%>%
 #add year column
 df_2020 <- df_2020 %>% mutate(year = 2020)
 
-
-dat_2021<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B15003_017E',employment_status = 'B23025_001E',
-                                pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
-                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
-                  
-                  zip = "MA", 
-                  year = 2021)
-
-
-df_2021<-dat_2021%>%
-  mutate(GEOID = as.integer(GEOID))%>%
-  filter(GEOID %in% zips)%>%
-  select(-moe)%>%
-  pivot_wider(names_from = variable, values_from = estimate)
-
-df_2021 <- df_2021 %>% mutate(year = 2021)
-
-
-dat_2018<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B15003_017E',employment_status = 'B23025_001E',
-                                pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
-                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
-                  
-                  zip = "MA", 
-                  year = 2018)
-df_2018<-dat_2018%>%
-  mutate(GEOID = as.integer(GEOID))%>%
-  filter(GEOID %in% zips)%>%
-  select(-moe)%>%
-  pivot_wider(names_from = variable, values_from = estimate)
-
-df_2018 <- df_2018 %>% mutate(year = 2018)
-
-
 dat_2019<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B15003_017E',employment_status = 'B23025_001E',
-                                pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
                   
                   zip = "MA", 
                   year = 2019)
@@ -100,13 +104,33 @@ df_2019<-dat_2019%>%
 df_2019 <- df_2019 %>% mutate(year = 2019)
 
 
+dat_2018<-get_acs(geography = 'zcta', 
+                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
+                  
+                  zip = "MA", 
+                  year = 2018)
+
+df_2018<-dat_2018%>%
+  mutate(GEOID = as.integer(GEOID))%>%
+  filter(GEOID %in% zips)%>%
+  select(-moe)%>%
+  pivot_wider(names_from = variable, values_from = estimate)
+
+df_2018 <- df_2018 %>% mutate(year = 2018)
+
+
 dat_2017<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B15003_017E',employment_status = 'B23025_001E',
-                                pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
                   
                   zip = "MA", 
                   year = 2017)
@@ -119,14 +143,13 @@ df_2017<-dat_2017%>%
 
 df_2017 <- df_2017 %>% mutate(year = 2017)
 
-
 dat_2016<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B15003_017E',employment_status = 'B23025_001E',
-                                pct_below_poverty_level = 'B17001_002E',pct_homes_owner_occupied = 'DP04_0046PE',
-                                total_pop = 'B02001_002E', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
                                 American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',single_parent_household_under_18 = 'B11005_003E'),
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
                   
                   zip = "MA", 
                   year = 2016)
@@ -140,12 +163,12 @@ df_2016<-dat_2016%>%
 df_2016 <- df_2016 %>% mutate(year = 2016)
 
 dat_2015<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
-                                has_highschool_diploma ="B15003_017E",employment_status = "B23025_001E",
-                                pct_below_poverty_level = "B17001_002E",pct_homes_owner_occupied = "DP04_0046PE",
-                                total_pop = "B02001_002E", White_alone = "B02001_002E", Black_or_African_American_alone = "B02001_003E",
-                                American_Indian_and_Alaska_Native_alone = "B02001_004E",Asian_alone = "B02001_005E", 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P",single_parent_household_under_18 = 'B11005_003E'),
+                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
+                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
                   
                   zip = "MA", 
                   year = 2015)
@@ -162,31 +185,23 @@ df_2015 <- df_2015 %>% mutate(year = 2015)
 combined_table <- bind_rows(df_2015, df_2016, df_2017,df_2018, df_2019, df_2020,df_2021)
 
 
-new_column_names<-c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
-  has_highschool_diploma ="B15003_017E",employment_status = "B23025_001E",
-  pct_below_poverty_level = "B17001_002E",pct_homes_owner_occupied = "DP04_0046PE",
-  total_pop = "B02001_002E", White_alone = "B02001_002E", Black_or_African_American_alone = "B02001_003E",
-  American_Indian_and_Alaska_Native_alone = "B02001_004E",Asian_alone = "B02001_005E", 
-  Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P",single_parent_household_under_18 = 'B11005_003E')
+new_column_names<-c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
+                    has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
+                    pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
+                    total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
+                    American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
+                    Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021')
 
-#rename the census return variables
+#rename the census return variables B02001_002
 df <- combined_table %>%
   rename(
-    medincome = medincome,
-    no_english = B16004_005,
+    White_alone = B02001_002,
     little_english = B16004_004,
-    has_highschool_diploma = B15003_017,
-    employment_status = B23025_001,
-    pct_below_poverty_level = B17001_002,
-    pct_homes_owner_occupied = DP04_0046P,
-    total_pop = B02001_002,
-    White_alone = B02001_003,
+    no_english = B16004_005,
     Black_or_African_American_alone = B02001_004,
     American_Indian_and_Alaska_Native_alone = B02001_005,
     Asian_alone = B02001_006, 
-    Native_Hawaiian_and_Other_Pacific_Islander_alone = DP04_0046P,
-    pct_25_and_up_bachelors_degree = pct_25_and_up_bachelors_degree,
-    single_parent_household_under_18 = B11005_003
+    below_highschool =has_highschool_diploma
   )
 
 colnames(df)
@@ -208,8 +223,6 @@ selected_columns <- shooting_data[, c(
 
 #add year column to shooting dataset 
 selected_columns$year <- year(as.Date(selected_columns$Date))
-
-
 
 
 zips<-c(02135,02121, 02122, 02124, 02125,02128,02136,02130,02126,02118,02119,02120,02132,02127,02111, 02116, 02118, 02119, 02120, 02127,02132)
@@ -234,8 +247,6 @@ with_districts <- df %>%
 final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
 
 write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
-
-
 colnames(final_df)
 
 
@@ -276,26 +287,23 @@ final_df%>%
   labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
-
-
 #Highschool plot
 final_df%>%
   group_by(district_name)%>%
-  select(year, district_name, has_highschool_diploma, Total.,incident_num)%>%
-  summarise(district_name=district_name,high_school_pct= mean(has_highschool_diploma/Total.), total_cases = sum(!duplicated(incident_num))) %>%
-  distinct()%>%
+  select(year, district_name, below_highschool, Total.,incident_num)%>%
+  summarise(high_school_pct= mean(below_highschool/Total.), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name, high_school_pct,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(y = 'Pct of population with high school diploma',title = 'Avg Populaion with HS Diploma and Total Cases Over All Years')
 
+#employment plot
 
 correlation_coef <- final_df%>%
   group_by(district_name)%>%
   summarise(employment_pct= mean(employment_status/Total.), total_cases = sum(!duplicated(incident_num)))%>%
   summarise(correlation_coef = round(cor(total_cases, employment_pct),2))
 
-#employment plot
 final_df%>%
   group_by(district_name)%>%
   summarise(employment_pct= mean(employment_status/Total.), total_cases = sum(!duplicated(incident_num))) %>%
@@ -318,11 +326,11 @@ final_df%>%
 #single parent household plot
 correlation_coef <- final_df%>%
   group_by(district_name)%>%
-  summarise(single_household = mean(single_parent_household_under_18/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(single_household = mean(one_parent/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
   summarise(correlation_coef = round(cor(single_household, total_cases),2))
 final_df%>%
   group_by(district_name)%>%
-  summarise(single_household = mean(single_parent_household_under_18/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(single_household = mean(one_parent/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name,single_household, fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
@@ -333,24 +341,28 @@ final_df%>%
 
 
 #poverty level plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(poverty_pct = mean(pct_below_poverty_level/ Total.),total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(poverty_pct, total_cases),2))
 final_df%>%
   group_by(district_name)%>%
   summarise(pct_below_poverty_level= mean(pct_below_poverty_level/Total.), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name, pct_below_poverty_level,fill = total_cases))+
   geom_bar(stat='identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')
-
+  labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 
 
 
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  summarise(no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
+  summarise(
             pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
-            mean_high_school_pct =mean(has_highschool_diploma/Total.), employment_pct = mean(employment_status/Total.),
-            total_cases = sum(!duplicated(incident_num)),single_household = mean(single_parent_household_under_18/ Total.))
+            employment_pct = mean(employment_status/Total.),
+            total_cases = sum(!duplicated(incident_num)),single_household = mean(one_parent/ Total.))
 
 
 ols<-lm(total_cases~ district_name+ medincome_mean+ pct_below_poverty_level+employment_pct, data = lm_dat)
@@ -361,7 +373,7 @@ vif(ols)
 #vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
 
 
-ols<-lm(total_cases~medincome_mean+employment_pct+single_household+pct_below_poverty_level, data = lm_dat)
+ols<-lm(total_cases~medincome_mean+single_household+pct_below_poverty_level, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
 vif(ols)
@@ -373,13 +385,12 @@ vif(ols)
 #check these plots for residuals, QQ, outliers
 plot(ols)
 
-
 logit_dat<-final_df%>%
   group_by(district_name, year,victim_gender)%>%
   summarise(victim_gender =victim_gender, no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
             pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
-            mean_high_school_pct =mean(has_highschool_diploma/Total.), employment_pct = mean(employment_status/Total.),
-            total_cases = sum(!duplicated(incident_num)),single_household = mean(single_parent_household_under_18/ Total.))%>%
+            mean_high_school_pct =mean(below_highschool/Total.), employment_pct = mean(employment_status/Total.),
+            total_cases = sum(!duplicated(incident_num)),single_household = mean(one_parent/ Total.))%>%
   distinct()
 
 #logistic regression to predict victims gender, residuals highly heteroskedastic, 
