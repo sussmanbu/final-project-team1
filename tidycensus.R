@@ -446,31 +446,18 @@ plot(ols)
 
 
 #time series forecast:
+library(dlym)
 
-
-
-
-
-logit_dat<-final_df%>%
-  group_by(district_name, year,victim_gender)%>%
-  summarise(victim_gender =victim_gender, no_english_pct = mean(no_english/Total.), black_pct =mean(Black_or_African_American_alone/Total.), 
-            pct_below_poverty_level=mean(pct_below_poverty_level/Total.),medincome_mean= mean(medincome),
-            mean_high_school_pct =mean(below_highschool/Total.), employment_pct = mean(employment_status/Total.),
-            total_cases = sum(!duplicated(incident_num)),single_household = mean(one_parent/ Total.))%>%
-  distinct()
-
-#logistic regression to predict victims gender, residuals highly heteroskedastic, 
-logit <- glm(factor(victim_gender) ~ employment_pct+ pct_below_poverty_level+mean_high_school_pct+ medincome_mean, data = logit_dat, family = binomial)
-coeftest(logit, vcov.=vcovHC)#heteroskedastic standard errors
-summary(logit)#homoskedasitic standard erros formula, pvalues much higher 
-
+final_df%>%
+  group_by(year)%>%
+  summarise(total_cases = sum(!duplicated(incident_num)))%>%
+  ggplot(aes(year, total_cases))+
+  geom_line()
 
 
 
 
 #update variables for these years 
-
-
 
 dat_2023<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
