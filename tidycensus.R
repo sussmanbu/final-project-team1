@@ -15,12 +15,14 @@ zips<-c(2135,2121, 2122, 2124, 2125,2128,2136,2130,2126,2118,2119,2120,2132,2127
 #tables: Employment status: B23025
 
 #variables: 
-# B06012_002 below 100% poverty level 
-# B01003_001 total population
-# B23025_007 Estimate!!Total:!!Not in labor force
-# B25004_001 total vacancy 
+# 1 B17002_001 Estimate!!Total:                Ratio of Income to Poverty Level in the Past 12 Months
+# B19013_001 Estimate!!Median household income in the past 12 months (in 2022 inflation-adjusted dollars) Median Household I…
+#  B01003_001 Estimate!!Total Total Population
+#B23025_007 Estimate!!Total:!!Not in labor force Employment Status for the Population 16 Years and Over
+# B25004_001 Estimate!!Total: Vacancy Status
 # B23008_021 Estimate!!Total!!6 to 17 years!!Living with one parent    
 # B14001_010 Estimate!!Total:!!Not enrolled in school School Enrollment by Level of School for the Population 3 Years and Over
+#1 B17011_001 Estimate!!Aggregate income deficit in the past 12 months:                                               
 
 
 vars<-load_variables(2022, "acs1", cache = TRUE)
@@ -30,8 +32,8 @@ print(search, n=100)
 
 vars<-load_variables(2022, "acs1", cache = TRUE)
 search<-vars %>%
-  filter(str_detect(name,'B25004'))
-print(search, n=100)
+  filter(str_detect(name,'B17002'))
+print(search, n=700)
 
 dat_2022<-get_acs(geography = 'zcta', 
                   variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
