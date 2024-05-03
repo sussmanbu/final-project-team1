@@ -243,6 +243,13 @@ ols_step_backward_p(ols)
 
 
 #Spatial analysis 
+with_geometry <- get_acs(
+  geography = "tract",
+  variables = c(total_house_units = 'B25001_001'),
+  state = "MA",
+  geometry = TRUE,
+  year = 2021
+)
 
 
 #map
@@ -271,7 +278,13 @@ boston_local_seg <- pivot_race %>%
 
 boston_local_seg$GEOID<-as.character(boston_local_seg$GEOID)
 
-
+with_geometry <- get_acs(
+  geography = "tract",
+  variables = c(total_house_units = 'B25001_001'),
+  state = "MA",
+  geometry = TRUE,
+  year = 2021
+)
 
 MA_tracts_seg <- tracts("MA", cb = TRUE, year = 2020) %>%
   inner_join(boston_local_seg, by = "GEOID") 
@@ -287,64 +300,5 @@ MA_tracts_seg%>%
 #Geo weighted Regression 
 
 
-library(GWmodel)
-
-lm_dat<-final_df%>%
-  group_by(district_name, year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
-            total_cases = sum(!duplicated(incident_num)))
-
-formula2 <- "lm(total_cases~ unemployment +medincome_mean+bachelors+one_parent+married_house, data = roxbury_lm_dat)"
-
-dfw_data_sp <- lm_dat %>%
-  as_Spatial()
-
-gw_model <- gwr.basic(
-  formula = formula2, 
-  data = lm_dat, 
-  bw = bw,
-  kernel = "bisquare",
-  adaptive = TRUE
-)
-
-#time series forecast:
-library(dynlm)
-unloadNamespace('dyplr')
-
-final_df%>%
-  group_by(year)%>%
-  summarise(total_cases = sum(!duplicated(incident_num)))%>%
-  ggplot(aes(year, total_cases))+
-  geom_line()
-
-lm_dat<-final_df%>%
-  group_by(year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
-            total_cases = sum(!duplicated(incident_num)))
-
-unempl_zoo = as.zoo(lm_dat$unemployment)
-total_zoo = as.zoo(lm_dat$total_cases)
-parent_zoo = as.zoo(lm_dat$one_parent)
-
-reg1 <- dynlm(log(total_zoo) ~ L(log(total_zoo),1:2)+L(log(unempl_zoo),1), data = lm_dat )
-
-test1 <- coeftest(reg1, vcov = vcovHAC)
-print(test1)
-
-out1 = data.frame( t = 0:18, Impact = reg1$coef[2:4], UB = reg1$coef[2:4] + 1.96*test1[2:4,2], LB = reg1$coef[2:4] - 1.96*test1[2:4,2] )
-
-FOJC_pctc = as.zoo(FOJC_pctc)
-FDD = as.zoo(FDD) 
-
-selected_columns$Date<-as.Date(selected_columns$Date)
-
-count_dates<-selected_columns%>%
-  mutate(month_year =format(Date, "%Y-%m"))%>%
-  group_by(month_year)%>%
-  summarize(unique_dates = rev(unique(month_year)))
-
-print(count_dates,n=200)
 
 ```
