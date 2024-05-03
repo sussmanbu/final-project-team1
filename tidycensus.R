@@ -453,14 +453,48 @@ library(GWmodel)
 
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
+  summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),
+            nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), 
+            asian_pct = mean(Asian_alone/total_pop),
+            pct_black = mean(Black_or_African_American_alone/total_pop),
+            pct_white = mean(White_alone/total_pop),
+            unemployment=mean(not_in_labor_force/total_pop),
+            medincome_mean= mean(household_medincome),
+            bachelors = mean(bachelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),
+            married_house= mean(married_households/total_house_units),
+            vacant_houses = mean(vacancy_status/total_house_units),
+            travel_work = mean(aggregate_time_to_work),
             total_cases = sum(!duplicated(incident_num)))
+
+
+with_geometry <- get_acs(
+  geography = "tract",
+  variables = c(total_house_units = 'B25001_001'),
+  state = "MA",
+  geometry = TRUE,
+  year = 2021
+)
+
+
+spatial_dat<-get_acs(
+  geography='tract',
+  variables = c(percent_ooh = "DP04_0046P"),
+  state = 'MA',
+  geometry = TRUE,
+  year =2020
+)%>%
+st_transform(st_crs(with_geometry))
+
+spatial_dat%>%
+  as_Spatial()
+
 
 formula2 <- "lm(total_cases~ unemployment +medincome_mean+bachelors+one_parent+married_house, data = roxbury_lm_dat)"
 
 dfw_data_sp <- lm_dat %>%
   as_Spatial()
+
 
 gw_model <- gwr.basic(
   formula = formula2, 
