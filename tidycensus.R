@@ -166,10 +166,9 @@ merge_geometry<-left_join(merge_tract_zcta, with_geometry_select, by='GEOID_TRAC
 
 saveRDS(merge_geometry, "all_census_dat.rdr")
 
-final_df<-readRDS(all_census_dat.rdr)
+final_df<-readRDS('all_census_dat.rdr')
 
 #write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)
-final_df<-read.csv('census_dat.csv') #right now geometry column messing this up, fix later 
 
 library(tidycensus)
 library(tidyverse)
@@ -177,6 +176,10 @@ library(sandwich)
 library(lmtest)
 library(car)
 library(leaps)
+library(segregation)
+library(tigris)
+library(sf)
+library(olsrr)
 
 #shows correlation between income and total cases for each district. Lower income => more cases 
 
@@ -215,7 +218,7 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 #income plot
-correlation_coef <- merge_geometry%>%
+correlation_coef <- final_df%>%
   group_by(district_name)%>%
   summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
   summarise(correlation_coef = round(cor(total_cases, medincome_mean),2))
@@ -368,24 +371,33 @@ final_df%>%
   geom_smooth(method ='lm')
 
 
-library(olsrr)
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), asian_pct = mean(Asian_alone/total_pop),pct_black = mean(pct_white = mean(Black_or_African_American_alone/total_pop),White_alone/total_pop),unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bachelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
+  summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),
+            nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), 
+            asian_pct = mean(Asian_alone/total_pop),
+            pct_black = mean(Black_or_African_American_alone/total_pop),
+            pct_white = mean(White_alone/total_pop),
+            unemployment=mean(not_in_labor_force/total_pop),
+            medincome_mean= mean(household_medincome),
+            bachelors = mean(bachelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),
+            married_house= mean(married_households/total_house_units),
+            vacant_houses = mean(vacancy_status/total_house_units),
+            travel_work = mean(aggregate_time_to_work),
             total_cases = sum(!duplicated(incident_num)))
 
-ols<-lm(total_cases~ district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat)
+#OLS with all variables 
+ols<-lm(total_cases~travel_work+ pct_white+pct_black+asian_pct+nhpt_pct+aian_pct+district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols) #92 adjusted Rsquared good for forecasting
-vif(ols)
-ols_step_forward_p(ols)
-ols_step_backward_p(ols)
-#interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity
-#vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
+vif(ols) # vif, look for correlated variables,anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
 
-I(age^2)
-ols<-lm(total_cases~ unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
+ols_step_forward_p(ols) #forward and backwards variable selection 
+ols_step_backward_p(ols)
+
+#OLS socieoeconomic variables 
+ols<-lm(total_cases~ travel_work+unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
 vif(ols)
@@ -393,22 +405,35 @@ ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 plot(ols)
 
-#roxbury has highest number of cases and Brighton has the lowest, OlS for these two
+#OLS race and socieoeconomic variables
+ols<-lm(total_cases~ asian_pct+pct_white+pct_black+nhpt_pct+aian_pct+travel_work+unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols)
+vif(ols)
+ols_step_forward_p(ols)
+ols_step_backward_p(ols)
+plot(ols)
 
-lm_dat<-final_df%>%
-  group_by(district_name, year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
-            total_cases = sum(!duplicated(incident_num)))
-
-ols<-lm(total_cases~+ unemployment +medincome_mean+bachelors+one_parent+married_house, data = roxbury_lm_dat)
+#OLS socieoeconomic and location
+ols<-lm(total_cases~travel_work+district_name+ unemployment+ medincome_mean+bachelors+one_parent+vacant_houses+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
 vif(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 
-library(segregation)
+#OLS race and location
+ols<-lm(total_cases~ pct_white+pct_black+asian_pct+nhpt_pct+aian_pct+district_name, data = lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols)
+vif(ols)
+ols_step_forward_p(ols)
+ols_step_backward_p(ols)
+
+
+#Spatial analysis 
+
+
 #map
 race_data<-c("White_alone", "Black_or_African_American_alone",
   "American_Indian_and_Alaska_Native_alone",
@@ -433,17 +458,10 @@ boston_local_seg <- pivot_race %>%
   )%>%
   rename(GEOID = GEOID_TRACT_20)
 
-
-str(boston_local_seg)
 boston_local_seg$GEOID<-as.character(boston_local_seg$GEOID)
 
-library(tigris)
-library(tidyverse)
-library(sf)
-library(spgwr)
 
 #save as rds, and read rds 
-
 
 MA_tracts_seg <- tracts("MA", cb = TRUE, year = 2020) %>%
   inner_join(boston_local_seg, by = "GEOID") 
@@ -479,8 +497,6 @@ gw_model <- gwr.basic(
   kernel = "bisquare",
   adaptive = TRUE
 )
-
-
 
 #time series forecast:
 library(dynlm)
