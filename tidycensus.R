@@ -204,8 +204,59 @@ df_2015<-dat_2015%>%
 df_2015 <- df_2015 %>% mutate(year = 2015)
 
 
+fetch_acs_data <- function(year, zips) {
+  dat <- get_acs(geography = 'zcta', 
+                 variables = c(total_house_units = 'B25001_001',
+                               non_married_household = 'B11001A_004',
+                               bachelors_25 = 'B15003_022',
+                               one_parent = 'B23008_021',
+                               married_households = 'B11001A_003',
+                               income_deficit = 'B17011_001',
+                               medincome = 'B19013_001',
+                               not_enrolled_school = 'B14001_010',
+                               not_in_labor_force = 'B23025_007',
+                               pct_below_poverty_level = 'B06012_002',
+                               vacancy_status = 'B25004_001',
+                               total_pop = 'B01003_001',
+                               White_alone = 'B02001_002',
+                               Black_or_African_American_alone = 'B02001_003',
+                               American_Indian_and_Alaska_Native_alone = 'B02001_004',
+                               Asian_alone = 'B02001_005',
+                               Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006'),
+                 zip = "MA", 
+                 year = year)
+  
+  df <- dat %>%
+    mutate(GEOID = as.integer(GEOID)) %>%
+    filter(GEOID %in% zips) %>%
+    select(-moe) %>%
+    pivot_wider(names_from = variable, values_from = estimate) %>%
+    mutate(year = year)
+  
+  return(df)
+}
+
+years <- c(2022,2021,2020,2019,2018,2017, 2016, 2015)
+
+dfs <- list()
+
+for (year in years) {
+  df <- fetch_acs_data(year, zips)
+  dfs[[length(dfs) + 1]] <- df
+}
+
+combined_df <- bind_rows(dfs)
+
+
+
+
 #combine all the acs data into one table 
 combined_table <- rbind(df_2015, df_2016, df_2017,df_2018, df_2019, df_2020,df_2021,df_2022)
+
+nrow(combined_table)
+
+
+
 
 #get original data set columns
 selected_columns <- shooting_data[, c(
@@ -245,6 +296,7 @@ with_districts <- combined_table %>%
 
 final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
 
+nrow(final_df)
 write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
 colnames(final_df)
 
@@ -440,13 +492,72 @@ summary(ols)
 vif(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
-
-
 plot(ols)
+
+#roxbury has highest number of cases and Brighton has the lowest, OlS for these two
+
+roxbury_lm_dat<-final_df%>%
+  group_by(district_name, year)%>%
+  filter(district_name== 'Roxbury')%>%
+  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
+            total_cases = sum(!duplicated(incident_num)))
+
+ols<-lm(total_cases~+ unemployment +medincome_mean+bachelors+one_parent+married_house, data = roxbury_lm_dat)
+coeftest(ols, vcov. = vcovHC)
+summary(ols)
+vif(ols)
+ols_step_forward_p(ols)
+ols_step_backward_p(ols)
+
+
+
+library(segregation)
+#map
+race_data<-c("White_alone", "Black_or_African_American_alone",
+  "American_Indian_and_Alaska_Native_alone",
+  "Asian_alone", "Native_Hawaiian_and_Other_Pacific_Islander_alone")
+
+
+pivot_race<-final_df%>%
+  group_by(year, GEOID)%>%
+  pivot_longer(race_data,names_to ='ethnicity',values_to = 'population_count')%>%
+  ungroup()%>%
+  group_by(ethnicity, GEOID)%>%
+  summarise(mean_population_count = mean(population_count))
+
+print(pivot_race, n =100)
+
+pivot_race%>%
+  ungroup()%>%
+  summarise(unique = unique(GEOID))
+
+boston_local_seg <- pivot_race %>%
+  mutual_local(
+    group = "ethnicity",
+    unit = "GEOID",
+    weight = "mean_population_count", 
+    wide = TRUE
+  )
+
+library(sf)
+
+print(boston_local_seg, n = 20)
+boston_local_seg%>%
+  ggplot(aes(fill = ls)) + 
+  geom_sf(color = NA) + 
+  scale_fill_viridis_c(option = "inferno") + 
+  theme_void() + 
+  labs(fill = "Local\nsegregation index")
+  
+#need geometry data   
+
+
 
 
 #time series forecast:
-library(dlym)
+library(dynlm)
+unloadNamespace('dyplr')
 
 final_df%>%
   group_by(year)%>%
@@ -454,7 +565,34 @@ final_df%>%
   ggplot(aes(year, total_cases))+
   geom_line()
 
+lm_dat<-final_df%>%
+  group_by(year)%>%
+  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
+            total_cases = sum(!duplicated(incident_num)))
 
+unempl_zoo = as.zoo(lm_dat$unemployment)
+total_zoo = as.zoo(lm_dat$total_cases)
+parent_zoo = as.zoo(lm_dat$one_parent)
+
+reg1 <- dynlm(log(total_zoo) ~ L(log(total_zoo),1:2)+L(log(unempl_zoo),1), data = lm_dat )
+
+test1 <- coeftest(reg1, vcov = vcovHAC)
+print(test1)
+
+out1 = data.frame( t = 0:18, Impact = reg1$coef[2:4], UB = reg1$coef[2:4] + 1.96*test1[2:4,2], LB = reg1$coef[2:4] - 1.96*test1[2:4,2] )
+
+FOJC_pctc = as.zoo(FOJC_pctc)
+FDD = as.zoo(FDD) 
+
+selected_columns$Date<-as.Date(selected_columns$Date)
+
+count_dates<-selected_columns%>%
+  mutate(month_year =format(Date, "%Y-%m"))%>%
+  group_by(month_year)%>%
+  summarize(unique_dates = rev(unique(month_year)))
+
+print(count_dates,n=200)
 
 
 #update variables for these years 
