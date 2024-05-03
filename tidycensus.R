@@ -184,38 +184,16 @@ library(olsrr)
 #shows correlation between income and total cases for each district. Lower income => more cases 
 
 #time to work plot 
-correlation_coef <- final_df%>%
-  group_by(district_name,year)%>%
-  filter(district_name=='Brighton')%>%
-  na.omit(aggregate_time_to_work)%>%
-  select(incident_num)
-  summarise(medincome_mean= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
-  summarise(correlation_coef = round(cor(total_cases, medincome_mean),2))
 
-print(correlation_coef, n=100)
-
-final_df%>%
-  group_by(district_name)
 
 final_df%>%
   group_by(district_name,year)%>%
   na.omit(aggregate_time_to_work)%>%
-  summarise(medincome_mean= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(district_name, medincome_mean,fill = total_cases))+
-  geom_bar(stat= 'identity')+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
-  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
-
-final_df%>%
-  group_by(district_name,year)%>%
-  na.omit(aggregate_time_to_work)%>%
-  summarise(medincome_mean= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes( medincome_mean,total_cases))+
+  summarise(work_time= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes( work_time,total_cases))+
   geom_point()+
   geom_smooth(method ='lm')+
-  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
-  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+  labs(y = 'Avg travel time to work',title = 'Avg Travel Time to Work and Total Cases')
 
 #income plot
 correlation_coef <- final_df%>%
@@ -250,17 +228,17 @@ correlation_coef <- final_df%>%
 
 final_df%>%
   group_by(district_name)%>%
-  summarise(pct_not_enrolled= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(district_name, pct_not_enrolled,fill = total_cases))+
+  summarise(pct_bachelors= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, pct_bachelors,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Pct of population with high school diploma',title = 'Avg Populaion with HS Diploma and Total Cases Over All Years')+
+  labs(y = 'Pct of Population with Bachelors ',title = 'Bachelors Degree and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 final_df%>%
   group_by(district_name)%>%
-  summarise(pct_not_enrolled= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(pct_not_enrolled, total_cases))+
+  summarise(pct_bachelors= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(pct_bachelors, total_cases))+
   geom_point()+
   geom_smooth(method ='lm')
 
@@ -277,7 +255,7 @@ final_df%>%
   ggplot(aes(district_name, unemployment_pct,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Pct of population employed',title = 'Avg Employment pct and Total Cases Over All Years')+
+  labs(y = 'Pct Unemployed',title = 'Avg Unemployment and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 final_df%>%
@@ -287,11 +265,6 @@ final_df%>%
   geom_point()+
   geom_smooth(method ='lm')
 
-final_df%>%
-  group_by(district_name)%>%
-  summarise(unemployment_pct= mean(not_in_labor_force/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(unemployment_pct))+
-  geom_histogram()
 
 #total cases for districts plot
 final_df%>%
@@ -337,7 +310,7 @@ final_df%>%
   ggplot(aes(district_name, married_house_pct,fill = total_cases))+
   geom_bar(stat='identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')+
+  labs(y = 'Avg Pct Married Households',title = 'Avg Married Households and Total Cases ')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 final_df%>%
@@ -360,7 +333,7 @@ final_df%>%
   ggplot(aes(district_name, vaccant_house_pct,fill = total_cases))+
   geom_bar(stat='identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Avg pct below poverty level ',title = 'Avg pct below poverty level over All Years')+
+  labs(y = 'Vacant Households ',title = 'Avg Vacant Households and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 
 final_df%>%
@@ -461,7 +434,6 @@ boston_local_seg <- pivot_race %>%
 boston_local_seg$GEOID<-as.character(boston_local_seg$GEOID)
 
 
-#save as rds, and read rds 
 
 MA_tracts_seg <- tracts("MA", cb = TRUE, year = 2020) %>%
   inner_join(boston_local_seg, by = "GEOID") 
@@ -573,7 +545,6 @@ dat_2024<-get_acs(geography = 'zcta',
                 
                   zip = "MA", 
                   year = 2024)
-
 
 df_2024 <- dat_2024 %>%
   pivot_wider(
