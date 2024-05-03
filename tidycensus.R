@@ -172,8 +172,8 @@ library(sandwich)
 library(lmtest)
 library(car)
 library(leaps)
-final_df<-read.csv('census_dat.csv')
-nrow(final_df)
+
+final_df<-merge_geometry
 
 #shows correlation between income and total cases for each district. Lower income => more cases 
 
@@ -239,12 +239,12 @@ final_df%>%
 #Bachelors degree plot
 correlation_coef <- final_df%>%
   group_by(district_name)%>%
-  summarise(pct_not_enrolled= mean(bacehelors_25/total_pop), total_cases = sum(!duplicated(incident_num)))%>%
+  summarise(pct_not_enrolled= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num)))%>%
   summarise(correlation_coef = round(cor(total_cases, pct_not_enrolled),2))
 
 final_df%>%
   group_by(district_name)%>%
-  summarise(pct_not_enrolled= mean(bacehelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(pct_not_enrolled= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name, pct_not_enrolled,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
@@ -253,7 +253,7 @@ final_df%>%
 
 final_df%>%
   group_by(district_name)%>%
-  summarise(pct_not_enrolled= mean(bacehelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(pct_not_enrolled= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(pct_not_enrolled, total_cases))+
   geom_point()+
   geom_smooth(method ='lm')
@@ -368,7 +368,7 @@ final_df%>%
 library(olsrr)
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
+  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(household_medincome),bachelors = mean(bachelors_25/total_pop),
             one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
             total_cases = sum(!duplicated(incident_num)))
 
@@ -376,7 +376,6 @@ ols<-lm(total_cases~ district_name+ unemployment+ medincome_mean+bachelors+one_p
 coeftest(ols, vcov. = vcovHC)
 summary(ols) #92 adjusted Rsquared good for forecasting
 vif(ols)
-ols_step_all_possible(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 #interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity
