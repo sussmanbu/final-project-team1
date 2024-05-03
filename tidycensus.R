@@ -164,16 +164,19 @@ merge_tract_zcta<- left_join(final_df, tract_data, by = 'GEOID_ZCTA5_20') #merge
 
 merge_geometry<-left_join(merge_tract_zcta, with_geometry_select, by='GEOID_TRACT_20')#merge the new tract data with geometry GEOID 
 
-write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)
+saveRDS(merge_geometry, "all_census_dat.rdr")
+
+final_df<-readRDS(all_census_dat.rdr)
+
+#write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)
 final_df<-read.csv('census_dat.csv') #right now geometry column messing this up, fix later 
 
+library(tidycensus)
 library(tidyverse)
 library(sandwich)
 library(lmtest)
 library(car)
 library(leaps)
-
-final_df<-merge_geometry
 
 #shows correlation between income and total cases for each district. Lower income => more cases 
 
@@ -368,7 +371,7 @@ final_df%>%
 library(olsrr)
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(household_medincome),bachelors = mean(bachelors_25/total_pop),
+  summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), asian_pct = mean(Asian_alone/total_pop),pct_black = mean(pct_white = mean(Black_or_African_American_alone/total_pop),White_alone/total_pop),unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bachelors_25/total_pop),
             one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
             total_cases = sum(!duplicated(incident_num)))
 
@@ -382,7 +385,7 @@ ols_step_backward_p(ols)
 #vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity 
 
 I(age^2)
-ols<-lm(total_cases~+ unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
+ols<-lm(total_cases~ unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
 vif(ols)
@@ -392,9 +395,8 @@ plot(ols)
 
 #roxbury has highest number of cases and Brighton has the lowest, OlS for these two
 
-roxbury_lm_dat<-final_df%>%
+lm_dat<-final_df%>%
   group_by(district_name, year)%>%
-  filter(district_name== 'Roxbury')%>%
   summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
             one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
             total_cases = sum(!duplicated(incident_num)))
@@ -406,8 +408,6 @@ vif(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 
-
-
 library(segregation)
 #map
 race_data<-c("White_alone", "Black_or_African_American_alone",
@@ -416,38 +416,69 @@ race_data<-c("White_alone", "Black_or_African_American_alone",
 
 
 pivot_race<-final_df%>%
-  group_by(year, GEOID)%>%
+  group_by(year, GEOID_TRACT_20)%>%
   pivot_longer(race_data,names_to ='ethnicity',values_to = 'population_count')%>%
   ungroup()%>%
-  group_by(ethnicity, GEOID)%>%
+  group_by(ethnicity, GEOID_TRACT_20)%>%
   summarise(mean_population_count = mean(population_count))
 
 print(pivot_race, n =100)
 
-pivot_race%>%
-  ungroup()%>%
-  summarise(unique = unique(GEOID))
-
 boston_local_seg <- pivot_race %>%
   mutual_local(
     group = "ethnicity",
-    unit = "GEOID",
+    unit = "GEOID_TRACT_20",
     weight = "mean_population_count", 
     wide = TRUE
-  )
+  )%>%
+  rename(GEOID = GEOID_TRACT_20)
 
+
+str(boston_local_seg)
+boston_local_seg$GEOID<-as.character(boston_local_seg$GEOID)
+
+library(tigris)
+library(tidyverse)
 library(sf)
+library(spgwr)
 
-print(boston_local_seg, n = 20)
-boston_local_seg%>%
+#save as rds, and read rds 
+
+
+MA_tracts_seg <- tracts("MA", cb = TRUE, year = 2020) %>%
+  inner_join(boston_local_seg, by = "GEOID") 
+
+MA_tracts_seg%>%
   ggplot(aes(fill = ls)) + 
   geom_sf(color = NA) + 
+  coord_sf(crs = st_crs(with_geometry))+
   scale_fill_viridis_c(option = "inferno") + 
   theme_void() + 
   labs(fill = "Local\nsegregation index")
   
-#need geometry data   
+#Geo weighted Regression 
 
+
+library(GWmodel)
+
+lm_dat<-final_df%>%
+  group_by(district_name, year)%>%
+  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
+            total_cases = sum(!duplicated(incident_num)))
+
+formula2 <- "lm(total_cases~ unemployment +medincome_mean+bachelors+one_parent+married_house, data = roxbury_lm_dat)"
+
+dfw_data_sp <- lm_dat %>%
+  as_Spatial()
+
+gw_model <- gwr.basic(
+  formula = formula2, 
+  data = lm_dat, 
+  bw = bw,
+  kernel = "bisquare",
+  adaptive = TRUE
+)
 
 
 
@@ -489,6 +520,8 @@ count_dates<-selected_columns%>%
   summarize(unique_dates = rev(unique(month_year)))
 
 print(count_dates,n=200)
+
+
 
 
 #update variables for these years 
