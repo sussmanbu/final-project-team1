@@ -5,25 +5,79 @@ library(here)
 
 shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
 shooting_data <- mutate(shooting_data, year = year(Date))
-#maybe change every year or so
 
-#View(shooting_data)
+df_shooting <- as.data.frame(shooting_data) %>%
+  filter(victim_race != "")
 
-#View(df_fbr)
-#createa a fatality chart for each year
-#make it a proportion value instead
-#view how proportions change over the years.
-#find out what the range of years actually is
+df_shooting <- df_shooting %>%
+  mutate(victim_race = ifelse(v_hispanic_or_latinx == TRUE, "Hispanic or Latinx", victim_race))
+#View(df_shooting)  
+
+#Fatal Shootings by Race over Years faceted by District
+props <- df_shooting %>%
+  filter(fatal == "TRUE") %>%
+  group_by(victim_race, year, district_name) %>%
+  summarize(count = n())
+props$yearSolid <- as.integer(props$year)
+
+#View(props)
+
+ggplot(props, aes(x = yearSolid, y = count, color = victim_race)) +
+  geom_line() +
+  labs(title = "Fatal Shootings by Race over Years by District", x = "Year", y = "Fatalities") + 
+  scale_color_discrete(name="Race") +
+  scale_x_continuous(breaks = unique(props$yearSolid))+ 
+  facet_wrap(~district_name)
 
 
-#  test <- subset(shooting_data, year == 2016)
-#  fatal_by_race <- table(test$victim_race, test$fatal)
-  
-#  df_fbr <- as.data.frame(fatal_by_race)
-#  colnames(df_fbr) <- c("Race", "Fatal", "Freq")
-#  ggplot(df_fbr, aes(x = Race, y = Freq, fill = Fatal)) + geom_bar(stat = "Identity") + labs(title = paste("Fatal Shootings Across Races ",as.character(num)), x="Race",y="Frequency", fill = "Fatal")+ theme_minimal() + theme(axis.text.x= element_text(angle=45, hjust = 1))
+#Non Fatal Shootings by Race over Years faceted by District
+props2 <- df_shooting %>%
+  filter(fatal == "FALSE") %>%
+  group_by(victim_race, year, district_name) %>%
+  summarize(count = n())
+props2$yearSolid <- as.integer(props2$year)
 
-#facet wrap
+#View(props2)
 
-ggplot(df_fbr)
+ggplot(props2, aes(x = yearSolid, y = count, color = victim_race)) +
+  geom_line() +
+  labs(title = "Non Fatal Shootings by Race over Years by District", x = "Year", y = "Non Fatal Incidents") + 
+  scale_color_discrete(name="Race") +
+  scale_x_continuous(breaks = unique(props2$yearSolid))+
+  facet_wrap(~district_name)
+
+
+
+#Fatal Shootings by Race over Years Unfaceted
+props3 <- df_shooting %>%
+  filter(fatal == "TRUE") %>%
+  group_by(victim_race, year) %>%
+  summarize(count = n())
+props3$yearSolid <- as.integer(props3$year)
+
+#View(props)
+
+ggplot(props3, aes(x = yearSolid, y = count, color = victim_race)) +
+  geom_line() +
+  labs(title = "Fatal Shootings by Race over Years", x = "Year", y = "Fatalities") + 
+  scale_color_discrete(name="Race") +
+  scale_x_continuous(breaks = unique(props3$yearSolid))
+
+
+
+#Non Fatal Shootings by Race over Years Unfaceted
+props4 <- df_shooting %>%
+  filter(fatal == "FALSE") %>%
+  group_by(victim_race, year) %>%
+  summarize(count = n())
+props4$yearSolid <- as.integer(props4$year)
+
+#View(props4)
+
+ggplot(props4, aes(x = yearSolid, y = count, color = victim_race)) +
+  geom_line() +
+  labs(title = "Non Fatal Shootings by Race over Years", x = "Year", y = "Non Fatal Incidents") + 
+  scale_color_discrete(name="Race") +
+  scale_x_continuous(breaks = unique(props4$yearSolid))
+
 
