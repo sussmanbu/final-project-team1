@@ -164,7 +164,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="ot">&lt;-</span><span class="fu">readRDS</span>(<span class="st">'all_census_dat.rdr'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidycensus)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
@@ -202,324 +207,1499 @@ The following object is masked from 'package:purrr':
 
     some</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">'census_dat.csv'</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#shows correlation between income and total cases for each district. Lower income =&gt; more cases </span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#income plot</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">medincome_mean=</span> <span class="fu">mean</span>(medincome), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(total_cases, medincome_mean),<span class="dv">2</span>))</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, district_name, medincome, incident_num)<span class="sc">%&gt;%</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">medincome_mean=</span> <span class="fu">mean</span>(medincome), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()<span class="sc">%&gt;%</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, medincome_mean,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg median income'</span>,<span class="at">title =</span> <span class="st">'Avg Median Income and Total Cases Over All Years'</span>)<span class="sc">+</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaps)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(segregation)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tigris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>To enable caching of data, set `options(tigris_use_cache = TRUE)`
+in your R script or .Rprofile.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(olsrr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'olsrr'
+
+The following object is masked from 'package:datasets':
+
+    rivers</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#shows correlation between income and total cases for each district. Lower income =&gt; more cases </span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#time to work plot </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name,year)<span class="sc">%&gt;%</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>(aggregate_time_to_work)<span class="sc">%&gt;%</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">work_time=</span> <span class="fu">mean</span>(aggregate_time_to_work), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>( work_time,total_cases))<span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)<span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg travel time to work'</span>,<span class="at">title =</span> <span class="st">'Avg Travel Time to Work and Total Cases'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'district_name'. You can override using the
+`.groups` argument.
+`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#scatterplot with line of best fit </span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, district_name, medincome, incident_num)<span class="sc">%&gt;%</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">medincome_mean=</span> <span class="fu">mean</span>(medincome), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()<span class="sc">%&gt;%</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>( medincome_mean,total_cases))<span class="sc">+</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)<span class="sc">+</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg median income'</span>,<span class="at">title =</span> <span class="st">'Avg Median Income and Total Cases Over All Years'</span>)<span class="sc">+</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#income plot</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">medincome_mean=</span> <span class="fu">mean</span>(household_medincome), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(total_cases, medincome_mean),<span class="dv">2</span>))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">medincome_mean=</span> <span class="fu">mean</span>(household_medincome), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, medincome_mean,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg median income'</span>,<span class="at">title =</span> <span class="st">'Avg Median Income and Total Cases Over All Years'</span>)<span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#scatterplot with line of best fit </span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">medincome_mean=</span> <span class="fu">mean</span>(household_medincome), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>( medincome_mean,total_cases))<span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)<span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg median income'</span>,<span class="at">title =</span> <span class="st">'Avg Median Income and Total Cases Over All Years'</span>)<span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Highschool plot</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, district_name, has_highschool_diploma, Total.,incident_num)<span class="sc">%&gt;%</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">district_name=</span>district_name,<span class="at">high_school_pct=</span> <span class="fu">mean</span>(has_highschool_diploma<span class="sc">/</span>Total.), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()<span class="sc">%&gt;%</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, high_school_pct,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Pct of population with high school diploma'</span>,<span class="at">title =</span> <span class="st">'Avg Populaion with HS Diploma and Total Cases Over All Years'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
-dplyr 1.1.0.
-ℹ Please use `reframe()` instead.
-ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
-  always returns an ungrouped data frame and adjust accordingly.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'district_name'. You can override using the
-`.groups` argument.</code></pre>
-</div>
-<div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-3.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">employment_pct=</span> <span class="fu">mean</span>(employment_status<span class="sc">/</span>Total.), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num)))<span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(total_cases, employment_pct),<span class="dv">2</span>))</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#employment plot</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">employment_pct=</span> <span class="fu">mean</span>(employment_status<span class="sc">/</span>Total.), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, employment_pct,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Pct of population employed'</span>,<span class="at">title =</span> <span class="st">'Avg Employment pct and Total Cases Over All Years'</span>)<span class="sc">+</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Bachelors degree plot</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pct_not_enrolled=</span> <span class="fu">mean</span>(bachelors_25<span class="sc">/</span>total_pop), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num)))<span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(total_cases, pct_not_enrolled),<span class="dv">2</span>))</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pct_bachelors=</span> <span class="fu">mean</span>(bachelors_25<span class="sc">/</span>total_pop), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, pct_bachelors,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Pct of Population with Bachelors '</span>,<span class="at">title =</span> <span class="st">'Bachelors Degree and Total Cases'</span>)<span class="sc">+</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-4.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#total cases for districts plot</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name,total_cases))<span class="sc">+</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Total Cases by District'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pct_bachelors=</span> <span class="fu">mean</span>(bachelors_25<span class="sc">/</span>total_pop), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(pct_bachelors, total_cases))<span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-5.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#single parent household plot</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">single_household =</span> <span class="fu">mean</span>(single_parent_household_under_18<span class="sc">/</span> Total.),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(single_household, total_cases),<span class="dv">2</span>))</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">single_household =</span> <span class="fu">mean</span>(single_parent_household_under_18<span class="sc">/</span> Total.),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name,single_household, <span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Pct of Households with Single Parent'</span>)<span class="sc">+</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#not in labor force plot</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">unemployment_pct=</span> <span class="fu">mean</span>(not_in_labor_force<span class="sc">/</span>total_pop), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num)))<span class="sc">%&gt;%</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(total_cases, unemployment_pct),<span class="dv">2</span>))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">unemployment_pct=</span> <span class="fu">mean</span>(not_in_labor_force<span class="sc">/</span>total_pop), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, unemployment_pct,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Pct Unemployed'</span>,<span class="at">title =</span> <span class="st">'Avg Unemployment and Total Cases'</span>)<span class="sc">+</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-6.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#poverty level plot</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pct_below_poverty_level=</span> <span class="fu">mean</span>(pct_below_poverty_level<span class="sc">/</span>Total.), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, pct_below_poverty_level,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'identity'</span>)<span class="sc">+</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg pct below poverty level '</span>,<span class="at">title =</span> <span class="st">'Avg pct below poverty level over All Years'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">unemployment_pct=</span> <span class="fu">mean</span>(not_in_labor_force<span class="sc">/</span>total_pop), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(unemployment_pct, total_cases))<span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-7.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>lm_dat<span class="ot">&lt;-</span>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name, year)<span class="sc">%&gt;%</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">no_english_pct =</span> <span class="fu">mean</span>(no_english<span class="sc">/</span>Total.), <span class="at">black_pct =</span><span class="fu">mean</span>(Black_or_African_American_alone<span class="sc">/</span>Total.), </span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">pct_below_poverty_level=</span><span class="fu">mean</span>(pct_below_poverty_level<span class="sc">/</span>Total.),<span class="at">medincome_mean=</span> <span class="fu">mean</span>(medincome),</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_high_school_pct =</span><span class="fu">mean</span>(has_highschool_diploma<span class="sc">/</span>Total.), <span class="at">employment_pct =</span> <span class="fu">mean</span>(employment_status<span class="sc">/</span>Total.),</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num)),<span class="at">single_household =</span> <span class="fu">mean</span>(single_parent_household_under_18<span class="sc">/</span> Total.))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'district_name'. You can override using the
-`.groups` argument.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span> district_name<span class="sc">+</span> medincome_mean<span class="sc">+</span> pct_below_poverty_level<span class="sc">+</span>employment_pct, <span class="at">data =</span> lm_dat)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-t test of coefficients:
-
-                              Estimate  Std. Error t value  Pr(&gt;|t|)    
-(Intercept)                 1.4734e+01  1.6024e+01  0.9195 0.3627337    
-district_nameDorchester     2.8293e+01  1.1878e+01  2.3820 0.0215058 *  
-district_nameEast Boston    1.9820e-01  3.6226e+00  0.0547 0.9566115    
-district_nameJamaica Plain  1.5009e+01  3.6411e+00  4.1220 0.0001593 ***
-district_nameMattapan       4.5180e+01  4.1929e+00 10.7754 4.760e-14 ***
-district_nameRoxbury        5.4235e+01  8.9295e+00  6.0737 2.427e-07 ***
-district_nameSouth Boston   7.6087e+00  3.3917e+00  2.2434 0.0298422 *  
-district_nameSouth End      5.7032e+00  4.6210e+00  1.2342 0.2235374    
-medincome_mean             -1.4277e-04  1.3087e-04 -1.0909 0.2811044    
-pct_below_poverty_level    -4.8695e+01  7.1871e+01 -0.6775 0.5015332    
-employment_pct              6.7078e+00  2.8639e+01  0.2342 0.8158760    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols) <span class="co">#92 adjusted Rsquared good for forecasting</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = total_cases ~ district_name + medincome_mean + pct_below_poverty_level + 
-    employment_pct, data = lm_dat)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--15.8233  -2.1011   0.0317   2.3574  13.0355 
-
-Coefficients:
-                             Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)                 1.473e+01  2.270e+01   0.649  0.51964    
-district_nameDorchester     2.829e+01  1.525e+01   1.855  0.07015 .  
-district_nameEast Boston    1.982e-01  5.233e+00   0.038  0.96996    
-district_nameJamaica Plain  1.501e+01  4.385e+00   3.423  0.00133 ** 
-district_nameMattapan       4.518e+01  7.322e+00   6.171 1.74e-07 ***
-district_nameRoxbury        5.423e+01  1.176e+01   4.610 3.33e-05 ***
-district_nameSouth Boston   7.609e+00  4.551e+00   1.672  0.10148    
-district_nameSouth End      5.703e+00  6.409e+00   0.890  0.37825    
-medincome_mean             -1.428e-04  1.350e-04  -1.057  0.29596    
-pct_below_poverty_level    -4.870e+01  8.090e+01  -0.602  0.55026    
-employment_pct              6.708e+00  3.390e+01   0.198  0.84403    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 5.727 on 45 degrees of freedom
-Multiple R-squared:  0.9413,    Adjusted R-squared:  0.9283 
-F-statistic: 72.22 on 10 and 45 DF,  p-value: &lt; 2.2e-16</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                             GVIF Df GVIF^(1/(2*Df))
-district_name           456.11629  7        1.548581
-medincome_mean           12.73971  1        3.569273
-pct_below_poverty_level  29.73695  1        5.453160
-employment_pct          124.24004  1       11.146302</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#interpretation: where you live is the best predictor of cases as shown by total cases by locations graph, p-values are high for other variables indicates multicollinearity</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#vif, anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity </span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span>medincome_mean<span class="sc">+</span>employment_pct<span class="sc">+</span>single_household<span class="sc">+</span>pct_below_poverty_level, <span class="at">data =</span> lm_dat)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-t test of coefficients:
-
-                           Estimate  Std. Error t value  Pr(&gt;|t|)    
-(Intercept)              2.5255e+01  1.4400e+01  1.7538   0.08547 .  
-medincome_mean           4.2569e-04  2.0927e-04  2.0342   0.04715 *  
-employment_pct          -1.6157e+02  3.5390e+01 -4.5654 3.175e-05 ***
-single_household         5.6747e+02  7.5222e+01  7.5440 7.546e-10 ***
-pct_below_poverty_level  2.4853e+02  1.5053e+02  1.6510   0.10488    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = total_cases ~ medincome_mean + employment_pct + 
-    single_household + pct_below_poverty_level, data = lm_dat)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--26.8559  -7.6095  -0.6758   8.4018  27.7319 
-
-Coefficients:
-                          Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)              2.525e+01  1.656e+01   1.525 0.133476    
-medincome_mean           4.257e-04  2.507e-04   1.698 0.095639 .  
-employment_pct          -1.616e+02  3.909e+01  -4.133 0.000133 ***
-single_household         5.675e+02  9.411e+01   6.030 1.84e-07 ***
-pct_below_poverty_level  2.485e+02  1.692e+02   1.469 0.148053    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 13.89 on 51 degrees of freedom
-Multiple R-squared:  0.6091,    Adjusted R-squared:  0.5785 
-F-statistic: 19.87 on 4 and 51 DF,  p-value: 6.54e-10</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>         medincome_mean          employment_pct        single_household 
-               7.471888               28.102173                4.273531 
-pct_below_poverty_level 
-              22.126258 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#interpretation these variables are highly collinear, signs of the coefficients do not make sense </span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">#however as single households increases, cases increas,</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#as employment pct increases, cases decrease</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#check signs of estimates</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#check these plots for residuals, QQ, outliers</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#total cases for districts plot</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name,total_cases))<span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Total Cases by District'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-8.png" class="img-fluid" width="672"></p>
 </div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#single parent household plot</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">single_household =</span> <span class="fu">mean</span>(one_parent<span class="sc">/</span> total_pop),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(single_household, total_cases),<span class="dv">2</span>))</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">single_household =</span> <span class="fu">mean</span>(one_parent<span class="sc">/</span> total_pop),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name,single_household, <span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Pct of Households with Single Parent'</span>)<span class="sc">+</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-9.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">single_household =</span> <span class="fu">mean</span>(one_parent<span class="sc">/</span> total_pop),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(single_household, total_cases))<span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-10.png" class="img-fluid" width="672"></p>
 </div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#married househomes</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">married_house =</span> <span class="fu">mean</span>(married_households<span class="sc">/</span>total_house_units),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(married_house, total_cases),<span class="dv">2</span>))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">married_house_pct=</span> <span class="fu">mean</span>(married_households<span class="sc">/</span>total_house_units), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, married_house_pct,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Avg Pct Married Households'</span>,<span class="at">title =</span> <span class="st">'Avg Married Households and Total Cases '</span>)<span class="sc">+</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-11.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>logit_dat<span class="ot">&lt;-</span>final_df<span class="sc">%&gt;%</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name, year,victim_gender)<span class="sc">%&gt;%</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">victim_gender =</span>victim_gender, <span class="at">no_english_pct =</span> <span class="fu">mean</span>(no_english<span class="sc">/</span>Total.), <span class="at">black_pct =</span><span class="fu">mean</span>(Black_or_African_American_alone<span class="sc">/</span>Total.), </span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">pct_below_poverty_level=</span><span class="fu">mean</span>(pct_below_poverty_level<span class="sc">/</span>Total.),<span class="at">medincome_mean=</span> <span class="fu">mean</span>(medincome),</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_high_school_pct =</span><span class="fu">mean</span>(has_highschool_diploma<span class="sc">/</span>Total.), <span class="at">employment_pct =</span> <span class="fu">mean</span>(employment_status<span class="sc">/</span>Total.),</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num)),<span class="at">single_household =</span> <span class="fu">mean</span>(single_parent_household_under_18<span class="sc">/</span> Total.))<span class="sc">%&gt;%</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">married_house_pct=</span> <span class="fu">mean</span>(married_households<span class="sc">/</span>total_house_units), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(married_house_pct, total_cases))<span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
-dplyr 1.1.0.
-ℹ Please use `reframe()` instead.
-ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
-  always returns an ungrouped data frame and adjust accordingly.</code></pre>
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-12.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#vacant househomes</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>correlation_coef <span class="ot">&lt;-</span> final_df<span class="sc">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">vaccant_house =</span> <span class="fu">mean</span>(vacancy_status<span class="sc">/</span>total_house_units),<span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">correlation_coef =</span> <span class="fu">round</span>(<span class="fu">cor</span>(vaccant_house, total_cases),<span class="dv">2</span>))</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">vaccant_house_pct=</span> <span class="fu">mean</span>(vacancy_status<span class="sc">/</span>total_house_units), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(district_name, vaccant_house_pct,<span class="at">fill =</span> total_cases))<span class="sc">+</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'identity'</span>)<span class="sc">+</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Vacant Households '</span>,<span class="at">title =</span> <span class="st">'Avg Vacant Households and Total Cases'</span>)<span class="sc">+</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation coefficient: "</span>, correlation_coef), <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-13.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name)<span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">vaccant_house_pct=</span> <span class="fu">mean</span>(vacancy_status<span class="sc">/</span>total_house_units), <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num))) <span class="sc">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(vaccant_house_pct, total_cases))<span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span><span class="st">'lm'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'district_name', 'year', 'victim_gender'.
-You can override using the `.groups` argument.</code></pre>
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#logistic regression to predict victims gender, residuals highly heteroskedastic, </span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>logit <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">factor</span>(victim_gender) <span class="sc">~</span> employment_pct<span class="sc">+</span> pct_below_poverty_level<span class="sc">+</span>mean_high_school_pct<span class="sc">+</span> medincome_mean, <span class="at">data =</span> logit_dat, <span class="at">family =</span> binomial)</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(logit, <span class="at">vcov.=</span>vcovHC)<span class="co">#heteroskedastic standard errors</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-14.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>lm_dat<span class="ot">&lt;-</span>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district_name, year)<span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">aian_pct =</span> <span class="fu">mean</span>(American_Indian_and_Alaska_Native_alone<span class="sc">/</span>total_pop),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">nhpt_pct =</span> <span class="fu">mean</span>(Native_Hawaiian_and_Other_Pacific_Islander_alone<span class="sc">/</span>total_pop), </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">asian_pct =</span> <span class="fu">mean</span>(Asian_alone<span class="sc">/</span>total_pop),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">pct_black =</span> <span class="fu">mean</span>(Black_or_African_American_alone<span class="sc">/</span>total_pop),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">pct_white =</span> <span class="fu">mean</span>(White_alone<span class="sc">/</span>total_pop),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">unemployment=</span><span class="fu">mean</span>(not_in_labor_force<span class="sc">/</span>total_pop),</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">medincome_mean=</span> <span class="fu">mean</span>(household_medincome),</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">bachelors =</span> <span class="fu">mean</span>(bachelors_25<span class="sc">/</span>total_pop),</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">one_parent=</span> <span class="fu">mean</span>(one_parent<span class="sc">/</span>total_house_units),</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">married_house=</span> <span class="fu">mean</span>(married_households<span class="sc">/</span>total_house_units),</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">vacant_houses =</span> <span class="fu">mean</span>(vacancy_status<span class="sc">/</span>total_house_units),</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">travel_work =</span> <span class="fu">mean</span>(aggregate_time_to_work),</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_cases =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">duplicated</span>(incident_num)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'district_name'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#OLS with all variables </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span>travel_work<span class="sc">+</span> pct_white<span class="sc">+</span>pct_black<span class="sc">+</span>asian_pct<span class="sc">+</span>nhpt_pct<span class="sc">+</span>aian_pct<span class="sc">+</span>district_name<span class="sc">+</span> unemployment<span class="sc">+</span> medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span> vacant_houses<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-z test of coefficients:
+t test of coefficients:
 
-                           Estimate  Std. Error z value  Pr(&gt;|z|)    
-(Intercept)              2.6341e+00  2.3046e+00  1.1430 0.2530563    
-employment_pct          -1.5802e+01  9.0041e+00 -1.7550 0.0792559 .  
-pct_below_poverty_level  9.8619e+01  2.9291e+01  3.3668 0.0007604 ***
-mean_high_school_pct    -3.0802e+01  2.3831e+01 -1.2925 0.1961900    
-medincome_mean           3.5031e-05  3.9856e-05  0.8789 0.3794428    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+                              Estimate  Std. Error t value Pr(&gt;|t|)
+(Intercept)                 9.7937e+01  1.0228e+02  0.9575   0.3442
+travel_work                -4.0187e-05  3.7838e-05 -1.0621   0.2947
+pct_white                  -1.0627e+02  1.2048e+02 -0.8820   0.3832
+pct_black                   1.1077e+02  8.1762e+01  1.3548   0.1833
+asian_pct                  -1.2785e+02  1.7671e+02 -0.7235   0.4737
+nhpt_pct                    2.2813e+03  2.7216e+03  0.8382   0.4070
+aian_pct                   -4.9210e+02  5.5318e+02 -0.8896   0.3791
+district_nameDorchester    -5.4193e+01  5.6794e+01 -0.9542   0.3459
+district_nameEast Boston   -3.2850e+01  3.9127e+01 -0.8396   0.4063
+district_nameHyde Park     -1.0153e+02  6.8889e+01 -1.4738   0.1486
+district_nameJamaica Plain -4.6963e+01  3.9444e+01 -1.1906   0.2410
+district_nameMattapan      -9.5009e+01  8.9801e+01 -1.0580   0.2966
+district_nameRoxbury       -2.7633e+01  5.0993e+01 -0.5419   0.5910
+district_nameSouth Boston  -1.1259e+01  2.9941e+01 -0.3760   0.7089
+district_nameSouth End     -2.2583e+01  1.9381e+01 -1.1652   0.2510
+unemployment               -5.9114e+01  1.2267e+02 -0.4819   0.6326
+medincome_mean             -1.4528e-04  2.4802e-04 -0.5858   0.5614
+bachelors                  -1.7955e+01  1.4549e+02 -0.1234   0.9024
+one_parent                 -2.9040e+00  1.3005e+02 -0.0223   0.9823
+vacant_houses              -1.2311e+01  1.2749e+02 -0.0966   0.9236
+married_house               3.3916e+02  2.1558e+02  1.5733   0.1237</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logit)<span class="co">#homoskedasitic standard erros formula, pvalues much higher </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols) <span class="co">#92 adjusted Rsquared good for forecasting</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-glm(formula = factor(victim_gender) ~ employment_pct + pct_below_poverty_level + 
-    mean_high_school_pct + medincome_mean, family = binomial, 
-    data = logit_dat)
+lm(formula = total_cases ~ travel_work + pct_white + pct_black + 
+    asian_pct + nhpt_pct + aian_pct + district_name + unemployment + 
+    medincome_mean + bachelors + one_parent + vacant_houses + 
+    married_house, data = lm_dat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-15.505  -2.933   0.268   2.451  13.928 
 
 Coefficients:
-                          Estimate Std. Error z value Pr(&gt;|z|)
-(Intercept)              2.634e+00  7.619e+00   0.346    0.730
-employment_pct          -1.580e+01  1.350e+01  -1.171    0.242
-pct_below_poverty_level  9.862e+01  7.216e+01   1.367    0.172
-mean_high_school_pct    -3.080e+01  2.901e+01  -1.062    0.288
-medincome_mean           3.503e-05  7.658e-05   0.457    0.647
+                             Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                 9.794e+01  7.725e+01   1.268   0.2124  
+travel_work                -4.019e-05  3.357e-05  -1.197   0.2384  
+pct_white                  -1.063e+02  8.608e+01  -1.235   0.2244  
+pct_black                   1.108e+02  5.930e+01   1.868   0.0693 .
+asian_pct                  -1.278e+02  1.538e+02  -0.831   0.4110  
+nhpt_pct                    2.281e+03  2.363e+03   0.966   0.3402  
+aian_pct                   -4.921e+02  5.243e+02  -0.939   0.3537  
+district_nameDorchester    -5.419e+01  4.178e+01  -1.297   0.2023  
+district_nameEast Boston   -3.285e+01  3.243e+01  -1.013   0.3173  
+district_nameHyde Park     -1.015e+02  5.010e+01  -2.026   0.0496 *
+district_nameJamaica Plain -4.696e+01  2.872e+01  -1.635   0.1101  
+district_nameMattapan      -9.501e+01  6.238e+01  -1.523   0.1358  
+district_nameRoxbury       -2.763e+01  3.612e+01  -0.765   0.4488  
+district_nameSouth Boston  -1.126e+01  2.772e+01  -0.406   0.6868  
+district_nameSouth End     -2.258e+01  1.882e+01  -1.200   0.2375  
+unemployment               -5.911e+01  9.358e+01  -0.632   0.5313  
+medincome_mean             -1.453e-04  1.769e-04  -0.821   0.4164  
+bachelors                  -1.795e+01  1.178e+02  -0.152   0.8796  
+one_parent                 -2.904e+00  1.260e+02  -0.023   0.9817  
+vacant_houses              -1.231e+01  1.089e+02  -0.113   0.9106  
+married_house               3.392e+02  1.763e+02   1.924   0.0617 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-(Dispersion parameter for binomial family taken to be 1)
-
-    Null deviance: 19.485  on 96  degrees of freedom
-Residual deviance: 14.722  on 92  degrees of freedom
-AIC: 24.722
-
-Number of Fisher Scoring iterations: 8</code></pre>
+Residual standard error: 6.091 on 39 degrees of freedom
+  (3 observations deleted due to missingness)
+Multiple R-squared:  0.9426,    Adjusted R-squared:  0.9131 
+F-statistic:    32 on 20 and 39 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols) <span class="co"># vif, look for correlated variables,anything above 5 high collinearity, below 1 no collinearity, above 1 medium collinearity </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                       GVIF Df GVIF^(1/(2*Df))
+travel_work    6.591104e+01  1        8.118561
+pct_white      6.032264e+02  1       24.560668
+pct_black      3.741905e+02  1       19.344004
+asian_pct      1.338921e+02  1       11.571176
+nhpt_pct       4.085129e+00  1        2.021170
+aian_pct       2.913079e+00  1        1.706774
+district_name  8.835884e+10  8        4.832152
+unemployment   2.529459e+01  1        5.029372
+medincome_mean 2.393767e+01  1        4.892614
+bachelors      1.775908e+02  1       13.326321
+one_parent     1.548519e+02  1       12.443952
+vacant_houses  1.071442e+01  1        3.273289
+married_house  1.701447e+02  1       13.043953</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_forward_p</span>(ols) <span class="co">#forward and backwards variable selection </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                                
+-----------------------------------------------------------------------------
+Step    Variable            AIC        SBC       SBIC        R2       Adj. R2 
+-----------------------------------------------------------------------------
+ 0      Base Model        536.679    540.868    362.921    0.00000    0.00000 
+ 1      district_name     400.745    421.689    216.894    0.92052    0.90805 
+ 2      pct_black         398.355    421.393    215.182    0.92613    0.91283 
+ 3      married_house     396.764    421.896    214.505    0.93042    0.91622 
+ 4      pct_white         396.361    423.588    215.099    0.93315    0.91783 
+ 5      medincome_mean    395.147    424.468    215.297    0.93664    0.92046 
+ 6      travel_work       395.497    426.912    216.916    0.93836    0.92093 
+-----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.969       RMSE                 5.088 
+R-Squared               0.938       MSE                 33.766 
+Adj. R-Squared          0.921       Coef. Var           29.372 
+Pred R-Squared          0.900       AIC                395.497 
+MAE                     3.526       SBC                426.912 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    23642.970        13       1818.690    53.862    0.0000 
+Residual       1553.214        46         33.766                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                            Parameter Estimates                                              
+------------------------------------------------------------------------------------------------------------
+                     model        Beta    Std. Error    Std. Beta      t        Sig        lower      upper 
+------------------------------------------------------------------------------------------------------------
+               (Intercept)      55.827        37.944                  1.471    0.148     -20.550    132.204 
+   district_nameDorchester     -48.253        27.773       -0.706    -1.737    0.089    -104.157      7.650 
+  district_nameEast Boston     -20.876        10.466       -0.346    -1.995    0.052     -41.944      0.192 
+    district_nameHyde Park     -87.876        31.210       -1.070    -2.816    0.007    -150.699    -25.053 
+district_nameJamaica Plain     -39.413        16.384       -0.419    -2.406    0.020     -72.391     -6.434 
+     district_nameMattapan     -72.996        43.736       -1.144    -1.669    0.102    -161.031     15.040 
+      district_nameRoxbury     -19.653        24.449       -0.326    -0.804    0.426     -68.867     29.561 
+ district_nameSouth Boston       4.960        10.713        0.082     0.463    0.646     -16.605     26.525 
+    district_nameSouth End     -26.366        14.177       -0.437    -1.860    0.069     -54.903      2.171 
+                 pct_black     102.308        49.003        1.281     2.088    0.042       3.670    200.947 
+             married_house     396.901       134.101        1.127     2.960    0.005     126.969    666.833 
+                 pct_white    -133.780        65.920       -1.465    -2.029    0.048    -266.471     -1.090 
+            medincome_mean       0.000         0.000       -0.148    -1.385    0.173       0.000      0.000 
+               travel_work       0.000         0.000       -0.214    -1.133    0.263       0.000      0.000 
+------------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_backward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                               
+----------------------------------------------------------------------------
+Step    Variable           AIC        SBC       SBIC        R2       Adj. R2 
+----------------------------------------------------------------------------
+ 0      Full Model       405.251    451.327    235.476    0.94257    0.91311 
+ 1      one_parent       403.252    447.233    232.399    0.94257    0.91528 
+ 2      vacant_houses    401.271    443.158    229.330    0.94255    0.91732 
+ 3      bachelors        399.321    439.113    226.279    0.94250    0.91923 
+ 4      unemployment     398.064    435.762    223.611    0.94178    0.92012 
+ 5      nhpt_pct         397.058    432.662    221.170    0.94081    0.92063 
+ 6      aian_pct         396.155    429.665    218.901    0.93972    0.92096 
+ 7      asian_pct        395.497    426.912    216.916    0.93836    0.92093 
+----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.969       RMSE                 5.088 
+R-Squared               0.938       MSE                 33.766 
+Adj. R-Squared          0.921       Coef. Var           29.372 
+Pred R-Squared          0.900       AIC                395.497 
+MAE                     3.526       SBC                426.912 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    23642.970        13       1818.690    53.862    0.0000 
+Residual       1553.214        46         33.766                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                            Parameter Estimates                                              
+------------------------------------------------------------------------------------------------------------
+                     model        Beta    Std. Error    Std. Beta      t        Sig        lower      upper 
+------------------------------------------------------------------------------------------------------------
+               (Intercept)      55.827        37.944                  1.471    0.148     -20.550    132.204 
+               travel_work       0.000         0.000       -0.214    -1.133    0.263       0.000      0.000 
+                 pct_white    -133.780        65.920       -1.465    -2.029    0.048    -266.471     -1.090 
+                 pct_black     102.308        49.003        1.281     2.088    0.042       3.670    200.947 
+   district_nameDorchester     -48.253        27.773       -0.706    -1.737    0.089    -104.157      7.650 
+  district_nameEast Boston     -20.876        10.466       -0.346    -1.995    0.052     -41.944      0.192 
+    district_nameHyde Park     -87.876        31.210       -1.070    -2.816    0.007    -150.699    -25.053 
+district_nameJamaica Plain     -39.413        16.384       -0.419    -2.406    0.020     -72.391     -6.434 
+     district_nameMattapan     -72.996        43.736       -1.144    -1.669    0.102    -161.031     15.040 
+      district_nameRoxbury     -19.653        24.449       -0.326    -0.804    0.426     -68.867     29.561 
+ district_nameSouth Boston       4.960        10.713        0.082     0.463    0.646     -16.605     26.525 
+    district_nameSouth End     -26.366        14.177       -0.437    -1.860    0.069     -54.903      2.171 
+            medincome_mean       0.000         0.000       -0.148    -1.385    0.173       0.000      0.000 
+             married_house     396.901       134.101        1.127     2.960    0.005     126.969    666.833 
+------------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">#OLS socieoeconomic variables </span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span> travel_work<span class="sc">+</span>unemployment <span class="sc">+</span>medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+                  Estimate  Std. Error t value Pr(&gt;|t|)   
+(Intercept)     9.4852e+01  5.1242e+01  1.8511 0.069735 . 
+travel_work    -6.4966e-05  2.1939e-05 -2.9612 0.004577 **
+unemployment   -7.4452e+01  9.3756e+01 -0.7941 0.430679   
+medincome_mean -3.6212e-04  2.2675e-04 -1.5971 0.116199   
+bachelors       2.9285e+01  4.4059e+01  0.6647 0.509138   
+one_parent      6.6162e+01  5.6817e+01  1.1645 0.249451   
+married_house  -5.2963e+01  4.7830e+01 -1.1073 0.273149   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = total_cases ~ travel_work + unemployment + medincome_mean + 
+    bachelors + one_parent + married_house, data = lm_dat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-24.287  -9.171  -2.724   8.861  29.983 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(&gt;|t|)   
+(Intercept)     9.485e+01  5.419e+01   1.750  0.08586 . 
+travel_work    -6.497e-05  2.026e-05  -3.207  0.00228 **
+unemployment   -7.445e+01  1.056e+02  -0.705  0.48379   
+medincome_mean -3.621e-04  1.915e-04  -1.891  0.06407 . 
+bachelors       2.929e+01  4.853e+01   0.603  0.54878   
+one_parent      6.616e+01  6.081e+01   1.088  0.28155   
+married_house  -5.296e+01  4.668e+01  -1.135  0.26165   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 14.14 on 53 degrees of freedom
+  (3 observations deleted due to missingness)
+Multiple R-squared:  0.5797,    Adjusted R-squared:  0.5321 
+F-statistic: 12.18 on 6 and 53 DF,  p-value: 1.472e-08</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   travel_work   unemployment medincome_mean      bachelors     one_parent 
+      4.458621       5.978254       5.209543       5.598985       6.697242 
+ married_house 
+      2.214488 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_forward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                                
+-----------------------------------------------------------------------------
+Step    Variable            AIC        SBC       SBIC        R2       Adj. R2 
+-----------------------------------------------------------------------------
+ 0      Base Model        536.679    540.868    364.808    0.00000    0.00000 
+ 1      bachelors         516.965    523.248    345.225    0.30365    0.29164 
+ 2      travel_work       502.456    510.833    331.562    0.47115    0.45259 
+ 3      married_house     497.438    507.910    327.257    0.52952    0.50432 
+ 4      medincome_mean    497.020    509.586    327.272    0.54811    0.51524 
+ 5      one_parent        495.238    509.899    326.395    0.57571    0.53642 
+-----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                           
+----------------------------------------------------------------
+R                        0.759       RMSE                13.348 
+R-Squared                0.576       MSE                197.972 
+Adj. R-Squared           0.536       Coef. Var           71.122 
+Pred R-Squared           0.487       AIC                495.238 
+MAE                     10.939       SBC                509.899 
+----------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    14505.712         5       2901.142    14.654    0.0000 
+Residual      10690.472        54        197.972                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                      Parameter Estimates                                       
+-----------------------------------------------------------------------------------------------
+         model       Beta    Std. Error    Std. Beta      t        Sig        lower      upper 
+-----------------------------------------------------------------------------------------------
+   (Intercept)     58.228        15.403                  3.780    0.000      27.346     89.110 
+     bachelors     32.335        48.110        0.140     0.672    0.504     -64.120    128.791 
+   travel_work      0.000         0.000       -0.490    -4.996    0.000       0.000      0.000 
+ married_house    -47.530        45.825       -0.135    -1.037    0.304    -139.404     44.344 
+medincome_mean      0.000         0.000       -0.287    -1.934    0.058      -0.001      0.000 
+    one_parent     91.511        48.825        0.347     1.874    0.066      -6.377    189.399 
+-----------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_backward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                              Stepwise Summary                               
+---------------------------------------------------------------------------
+Step    Variable          AIC        SBC       SBIC        R2       Adj. R2 
+---------------------------------------------------------------------------
+ 0      Full Model      496.678    513.433    328.220    0.57965    0.53207 
+ 1      bachelors       495.089    509.749    326.278    0.57677    0.53758 
+ 2      unemployment    493.738    506.304    324.563    0.57216    0.54105 
+---------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                           
+----------------------------------------------------------------
+R                        0.756       RMSE                13.404 
+R-Squared                0.572       MSE                195.998 
+Adj. R-Squared           0.541       Coef. Var           70.766 
+Pred R-Squared           0.495       AIC                493.738 
+MAE                     10.997       SBC                506.304 
+----------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    14416.283         4       3604.071    18.388    0.0000 
+Residual      10779.900        55        195.998                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                      Parameter Estimates                                       
+-----------------------------------------------------------------------------------------------
+         model       Beta    Std. Error    Std. Beta      t        Sig        lower      upper 
+-----------------------------------------------------------------------------------------------
+   (Intercept)     62.366        14.049                  4.439    0.000      34.212     90.520 
+   travel_work      0.000         0.000       -0.465    -5.154    0.000       0.000      0.000 
+medincome_mean      0.000         0.000       -0.222    -1.976    0.053       0.000      0.000 
+    one_parent     68.863        35.156        0.261     1.959    0.055      -1.592    139.318 
+ married_house    -53.755        44.655       -0.153    -1.204    0.234    -143.246     35.736 
+-----------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-15.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-16.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-17.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-18.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co">#OLS race and socieoeconomic variables</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span> asian_pct<span class="sc">+</span>pct_white<span class="sc">+</span>pct_black<span class="sc">+</span>nhpt_pct<span class="sc">+</span>aian_pct<span class="sc">+</span>travel_work<span class="sc">+</span>unemployment <span class="sc">+</span>medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat)</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+                  Estimate  Std. Error t value Pr(&gt;|t|)   
+(Intercept)     1.3063e+02  6.7256e+01  1.9423 0.057984 . 
+asian_pct      -2.4715e+02  9.4098e+01 -2.6265 0.011544 * 
+pct_white      -1.2999e+02  5.6956e+01 -2.2823 0.026942 * 
+pct_black      -1.7560e+01  4.0330e+01 -0.4354 0.665222   
+nhpt_pct       -1.9587e+03  3.4125e+03 -0.5740 0.568667   
+aian_pct        3.1088e+02  1.2231e+03  0.2542 0.800456   
+travel_work    -4.6825e-05  2.4781e-05 -1.8895 0.064867 . 
+unemployment    7.7196e+01  1.4762e+02  0.5229 0.603430   
+medincome_mean -5.9961e-04  2.3820e-04 -2.5173 0.015220 * 
+bachelors       2.0468e+02  7.3854e+01  2.7714 0.007918 **
+one_parent     -1.4436e+02  7.9823e+01 -1.8085 0.076799 . 
+married_house   8.1739e+01  1.0889e+02  0.7507 0.456515   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = total_cases ~ asian_pct + pct_white + pct_black + 
+    nhpt_pct + aian_pct + travel_work + unemployment + medincome_mean + 
+    bachelors + one_parent + married_house, data = lm_dat)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-24.3517  -6.8675   0.5879   5.6504  21.9139 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)     1.306e+02  5.228e+01   2.498 0.015951 *  
+asian_pct      -2.471e+02  6.861e+01  -3.602 0.000747 ***
+pct_white      -1.300e+02  4.768e+01  -2.726 0.008916 ** 
+pct_black      -1.756e+01  2.902e+01  -0.605 0.547983    
+nhpt_pct       -1.959e+03  3.613e+03  -0.542 0.590233    
+aian_pct        3.109e+02  8.590e+02   0.362 0.719018    
+travel_work    -4.683e-05  2.093e-05  -2.237 0.029956 *  
+unemployment    7.720e+01  1.252e+02   0.617 0.540297    
+medincome_mean -5.996e-04  1.967e-04  -3.049 0.003734 ** 
+bachelors       2.047e+02  7.339e+01   2.789 0.007559 ** 
+one_parent     -1.444e+02  6.191e+01  -2.332 0.023967 *  
+married_house   8.174e+01  8.164e+01   1.001 0.321769    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 11.14 on 48 degrees of freedom
+  (3 observations deleted due to missingness)
+Multiple R-squared:  0.7637,    Adjusted R-squared:  0.7096 
+F-statistic: 14.11 on 11 and 48 DF,  p-value: 1.45e-11</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     asian_pct      pct_white      pct_black       nhpt_pct       aian_pct 
+      7.969246      55.376014      26.808796       2.857756       2.339456 
+   travel_work   unemployment medincome_mean      bachelors     one_parent 
+      7.667755      13.536832       8.856232      20.632077      11.184373 
+ married_house 
+     10.914923 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_forward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                                
+-----------------------------------------------------------------------------
+Step    Variable            AIC        SBC       SBIC        R2       Adj. R2 
+-----------------------------------------------------------------------------
+ 0      Base Model        536.679    540.868    364.004    0.00000    0.00000 
+ 1      pct_black         496.985    503.269    324.746    0.50087    0.49226 
+ 2      travel_work       485.775    494.152    313.789    0.59951    0.58546 
+ 3      medincome_mean    481.693    492.164    309.881    0.63812    0.61873 
+ 4      asian_pct         478.236    490.802    306.879    0.66958    0.64555 
+ 5      one_parent        471.328    485.989    301.496    0.71516    0.68879 
+-----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.846       RMSE                10.937 
+R-Squared               0.715       MSE                132.904 
+Adj. R-Squared          0.689       Coef. Var           58.273 
+Pred R-Squared          0.651       AIC                471.328 
+MAE                     8.960       SBC                485.989 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    18019.393         5       3603.879    27.116    0.0000 
+Residual       7176.791        54        132.904                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                      Parameter Estimates                                        
+------------------------------------------------------------------------------------------------
+         model        Beta    Std. Error    Std. Beta      t        Sig        lower      upper 
+------------------------------------------------------------------------------------------------
+   (Intercept)     100.173        16.623                  6.026    0.000      66.845    133.500 
+     pct_black      46.698        11.284        0.585     4.138    0.000      24.075     69.321 
+   travel_work       0.000         0.000       -0.480    -5.526    0.000       0.000      0.000 
+medincome_mean       0.000         0.000       -0.426    -4.158    0.000      -0.001      0.000 
+     asian_pct    -162.440        43.028       -0.469    -3.775    0.000    -248.706    -76.175 
+    one_parent    -149.799        50.957       -0.568    -2.940    0.005    -251.962    -47.637 
+------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_backward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                              Stepwise Summary                               
+---------------------------------------------------------------------------
+Step    Variable          AIC        SBC       SBIC        R2       Adj. R2 
+---------------------------------------------------------------------------
+ 0      Full Model      472.112    499.339    307.715    0.76373    0.70958 
+ 1      aian_pct        470.276    495.408    305.307    0.76308    0.71473 
+ 2      nhpt_pct        468.594    491.632    303.007    0.76182    0.71895 
+ 3      unemployment    467.023    487.966    300.804    0.76012    0.72249 
+ 4      pct_black       465.460    484.309    298.644    0.75836    0.72583 
+---------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.871       RMSE                10.073 
+R-Squared               0.758       MSE                117.084 
+Adj. R-Squared          0.726       Coef. Var           54.695 
+Pred R-Squared          0.683       AIC                465.460 
+MAE                     8.094       SBC                484.309 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    19107.822         7       2729.689    23.314    0.0000 
+Residual       6088.362        52        117.084                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                       Parameter Estimates                                        
+-------------------------------------------------------------------------------------------------
+         model        Beta    Std. Error    Std. Beta      t        Sig        lower       upper 
+-------------------------------------------------------------------------------------------------
+   (Intercept)     144.109        20.189                  7.138    0.000     103.597     184.622 
+     asian_pct    -212.156        44.434       -0.612    -4.775    0.000    -301.319    -122.994 
+     pct_white    -111.545        27.583       -1.221    -4.044    0.000    -166.895     -56.195 
+   travel_work       0.000         0.000       -0.538    -6.344    0.000       0.000       0.000 
+medincome_mean      -0.001         0.000       -0.700    -5.262    0.000      -0.001       0.000 
+     bachelors     180.057        52.901        0.782     3.404    0.001      73.903     286.211 
+    one_parent    -142.547        55.966       -0.540    -2.547    0.014    -254.851     -30.242 
+ married_house     108.821        69.717        0.309     1.561    0.125     -31.077     248.719 
+-------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-19.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-20.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-21.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-22.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co">#OLS socieoeconomic and location</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span>travel_work<span class="sc">+</span>district_name<span class="sc">+</span> unemployment<span class="sc">+</span> medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span>vacant_houses<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat)</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+                              Estimate  Std. Error t value Pr(&gt;|t|)  
+(Intercept)                 1.6828e+01  5.5427e+01  0.3036  0.76287  
+travel_work                -1.6749e-05  3.2469e-05 -0.5159  0.60853  
+district_nameDorchester     2.4232e+01  2.9318e+01  0.8265  0.41298  
+district_nameEast Boston   -1.0101e+01  2.2265e+01 -0.4537  0.65230  
+district_nameHyde Park     -2.5818e+00  3.0135e+01 -0.0857  0.93211  
+district_nameJamaica Plain -1.3413e+00  2.0267e+01 -0.0662  0.94754  
+district_nameMattapan       4.5283e+01  3.4173e+01  1.3251  0.19197  
+district_nameRoxbury        4.7227e+01  2.1294e+01  2.2178  0.03178 *
+district_nameSouth Boston  -1.0937e+01  2.2289e+01 -0.4907  0.62609  
+district_nameSouth End      3.7975e+00  1.7222e+01  0.2205  0.82650  
+unemployment               -1.1044e+02  1.3417e+02 -0.8231  0.41487  
+medincome_mean             -1.2695e-04  1.7467e-04 -0.7268  0.47119  
+bachelors                   3.8170e+01  9.3347e+01  0.4089  0.68460  
+one_parent                  7.1493e+01  1.3505e+02  0.5294  0.59920  
+vacant_houses               3.0212e+01  1.1801e+02  0.2560  0.79913  
+married_house               1.2300e+02  1.2927e+02  0.9515  0.34655  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = total_cases ~ travel_work + district_name + unemployment + 
+    medincome_mean + bachelors + one_parent + vacant_houses + 
+    married_house, data = lm_dat)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-20.2346  -2.4600  -0.3183   2.5535  14.5437 
+
+Coefficients:
+                             Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                 1.683e+01  5.376e+01   0.313    0.756  
+travel_work                -1.675e-05  2.638e-05  -0.635    0.529  
+district_nameDorchester     2.423e+01  2.262e+01   1.071    0.290  
+district_nameEast Boston   -1.010e+01  1.821e+01  -0.555    0.582  
+district_nameHyde Park     -2.582e+00  2.592e+01  -0.100    0.921  
+district_nameJamaica Plain -1.341e+00  1.972e+01  -0.068    0.946  
+district_nameMattapan       4.528e+01  2.718e+01   1.666    0.103  
+district_nameRoxbury        4.723e+01  1.956e+01   2.414    0.020 *
+district_nameSouth Boston  -1.094e+01  1.933e+01  -0.566    0.574  
+district_nameSouth End      3.798e+00  1.533e+01   0.248    0.805  
+unemployment               -1.104e+02  9.054e+01  -1.220    0.229  
+medincome_mean             -1.269e-04  1.598e-04  -0.795    0.431  
+bachelors                   3.817e+01  1.010e+02   0.378    0.707  
+one_parent                  7.149e+01  1.243e+02   0.575    0.568  
+vacant_houses               3.021e+01  9.914e+01   0.305    0.762  
+married_house               1.230e+02  1.327e+02   0.927    0.359  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.379 on 44 degrees of freedom
+  (3 observations deleted due to missingness)
+Multiple R-squared:  0.9289,    Adjusted R-squared:  0.9047 
+F-statistic: 38.34 on 15 and 44 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                       GVIF Df GVIF^(1/(2*Df))
+travel_work    3.710835e+01  1        6.091663
+district_name  1.948618e+07  8        2.855012
+unemployment   2.158975e+01  1        4.646478
+medincome_mean 1.781252e+01  1        4.220488
+bachelors      1.191075e+02  1       10.913640
+one_parent     1.374741e+02  1       11.724935
+vacant_houses  8.095400e+00  1        2.845242
+married_house  8.786643e+01  1        9.373709</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_forward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                               
+----------------------------------------------------------------------------
+Step    Variable           AIC        SBC       SBIC        R2       Adj. R2 
+----------------------------------------------------------------------------
+ 0      Base Model       536.679    540.868    362.969    0.00000    0.00000 
+ 1      district_name    400.745    421.689    217.254    0.92052    0.90805 
+ 2      married_house    400.000    423.038    217.233    0.92407    0.91041 
+----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.961       RMSE                 5.647 
+R-Squared               0.924       MSE                 38.262 
+Adj. R-Squared          0.910       Coef. Var           31.267 
+Pred R-Squared          0.891       AIC                400.000 
+MAE                     3.905       SBC                423.038 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    23283.101         9       2587.011    67.614    0.0000 
+Residual       1913.083        50         38.262                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                           Parameter Estimates                                             
+----------------------------------------------------------------------------------------------------------
+                     model       Beta    Std. Error    Std. Beta      t        Sig       lower      upper 
+----------------------------------------------------------------------------------------------------------
+               (Intercept)    -17.728        13.159                 -1.347    0.184    -44.159      8.704 
+   district_nameDorchester     37.700         7.433        0.552     5.072    0.000     22.771     52.630 
+  district_nameEast Boston     -1.122         3.424       -0.019    -0.328    0.744     -8.000      5.755 
+    district_nameHyde Park      9.007         3.830        0.110     2.352    0.023      1.314     16.700 
+district_nameJamaica Plain     -0.415         7.923       -0.004    -0.052    0.958    -16.329     15.499 
+     district_nameMattapan     61.188        11.581        0.959     5.283    0.000     37.927     84.449 
+      district_nameRoxbury     53.152         3.093        0.882    17.185    0.000     46.939     59.364 
+ district_nameSouth Boston      0.240         4.107        0.004     0.058    0.954     -8.010      8.490 
+    district_nameSouth End      5.235         3.121        0.087     1.677    0.100     -1.034     11.503 
+             married_house    123.648        80.821        0.351     1.530    0.132    -38.686    285.981 
+----------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_backward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                               
+----------------------------------------------------------------------------
+Step    Variable           AIC        SBC       SBIC        R2       Adj. R2 
+----------------------------------------------------------------------------
+ 0      Full Model       408.032    443.636    230.040    0.92893    0.90470 
+ 1      vacant_houses    406.158    439.668    227.398    0.92878    0.90663 
+ 2      bachelors        404.353    435.768    224.815    0.92855    0.90836 
+ 3      one_parent       402.612    431.932    222.299    0.92824    0.90992 
+ 4      travel_work      400.969    428.195    219.887    0.92781    0.91127 
+ 5      married_house    399.525    424.657    217.675    0.92714    0.91227 
+----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.963       RMSE                 5.531 
+R-Squared               0.927       MSE                 37.464 
+Adj. R-Squared          0.912       Coef. Var           30.939 
+Pred R-Squared          0.889       AIC                399.525 
+MAE                     3.921       SBC                424.657 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    23360.430        10       2336.043    62.354    0.0000 
+Residual       1835.753        49         37.464                     
+Total         25196.183        59                                    
+---------------------------------------------------------------------
+
+                                            Parameter Estimates                                             
+-----------------------------------------------------------------------------------------------------------
+                     model        Beta    Std. Error    Std. Beta      t        Sig        lower     upper 
+-----------------------------------------------------------------------------------------------------------
+               (Intercept)      40.850        19.124                  2.136    0.038       2.419    79.282 
+   district_nameDorchester      26.743         3.493        0.392     7.656    0.000      19.723    33.763 
+  district_nameEast Boston      -5.088         4.331       -0.084    -1.175    0.246     -13.792     3.615 
+    district_nameHyde Park       9.000         3.773        0.110     2.385    0.021       1.417    16.582 
+district_nameJamaica Plain      12.247         4.599        0.130     2.663    0.010       3.005    21.488 
+     district_nameMattapan      41.288         3.486        0.647    11.842    0.000      34.282    48.295 
+      district_nameRoxbury      57.659         4.362        0.956    13.217    0.000      48.892    66.426 
+ district_nameSouth Boston       3.796         4.221        0.063     0.899    0.373      -4.687    12.279 
+    district_nameSouth End      14.662         5.393        0.243     2.719    0.009       3.824    25.500 
+              unemployment    -114.947        62.695       -0.237    -1.833    0.073    -240.937    11.043 
+            medincome_mean       0.000         0.000       -0.162    -1.895    0.064       0.000     0.000 
+-----------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co">#OLS race and location</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span> pct_white<span class="sc">+</span>pct_black<span class="sc">+</span>asian_pct<span class="sc">+</span>nhpt_pct<span class="sc">+</span>aian_pct<span class="sc">+</span>district_name, <span class="at">data =</span> lm_dat)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+                            Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                  28.8940    30.5825  0.9448  0.34940  
+pct_white                    -8.9926    22.0541 -0.4078  0.68523  
+pct_black                    94.9207    50.9320  1.8637  0.06837 .
+asian_pct                  -158.0074   144.2129 -1.0957  0.27859  
+nhpt_pct                    -51.6230   932.5152 -0.0554  0.95608  
+aian_pct                   -389.9836   408.4770 -0.9547  0.34440  
+district_nameDorchester     -22.3687    26.4583 -0.8454  0.40198  
+district_nameEast Boston    -14.2234    16.7741 -0.8479  0.40059  
+district_nameHyde Park      -52.8076    32.5581 -1.6220  0.11123  
+district_nameJamaica Plain  -11.5852    15.2060 -0.7619  0.44978  
+district_nameMattapan       -57.7040    49.6506 -1.1622  0.25078  
+district_nameRoxbury         14.9736    22.3076  0.6712  0.50522  
+district_nameSouth Boston   -11.5943    14.1452 -0.8197  0.41638  
+district_nameSouth End        5.8088     5.5926  1.0387  0.30406  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = total_cases ~ pct_white + pct_black + asian_pct + 
+    nhpt_pct + aian_pct + district_name, data = lm_dat)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-20.1410  -2.8804  -0.1689   2.8696  15.1280 
+
+Coefficients:
+                           Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                  28.894     41.454   0.697   0.4891  
+pct_white                    -8.993     38.177  -0.236   0.8148  
+pct_black                    94.921     39.090   2.428   0.0189 *
+asian_pct                  -158.007    144.681  -1.092   0.2801  
+nhpt_pct                    -51.623   2054.182  -0.025   0.9801  
+aian_pct                   -389.984    462.795  -0.843   0.4035  
+district_nameDorchester     -22.369     28.958  -0.772   0.4436  
+district_nameEast Boston    -14.223     18.606  -0.764   0.4483  
+district_nameHyde Park      -52.808     32.871  -1.606   0.1146  
+district_nameJamaica Plain  -11.585     15.202  -0.762   0.4497  
+district_nameMattapan       -57.704     49.681  -1.161   0.2511  
+district_nameRoxbury         14.974     21.627   0.692   0.4920  
+district_nameSouth Boston   -11.594     13.695  -0.847   0.4013  
+district_nameSouth End        5.809      7.285   0.797   0.4291  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.35 on 49 degrees of freedom
+Multiple R-squared:  0.9271,    Adjusted R-squared:  0.9077 
+F-statistic: 47.91 on 13 and 49 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                      GVIF Df GVIF^(1/(2*Df))
+pct_white     1.201084e+02  1       10.959399
+pct_black     1.672543e+02  1       12.932683
+asian_pct     1.119818e+02  1       10.582145
+nhpt_pct      2.897137e+00  1        1.702098
+aian_pct      2.134580e+00  1        1.461020
+district_name 3.743316e+05  8        2.230122</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_forward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                               Stepwise Summary                               
+----------------------------------------------------------------------------
+Step    Variable           AIC        SBC       SBIC        R2       Adj. R2 
+----------------------------------------------------------------------------
+ 0      Base Model       564.807    569.093    382.566    0.00000    0.00000 
+ 1      district_name    425.492    446.924    233.098    0.91502    0.90243 
+ 2      pct_black        420.148    443.723    228.686    0.92437    0.91153 
+----------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.961       RMSE                 5.703 
+R-Squared               0.924       MSE                 38.659 
+Adj. R-Squared          0.912       Coef. Var           29.630 
+Pred R-Squared          0.893       AIC                420.148 
+MAE                     3.790       SBC                443.723 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    25042.061         9       2782.451    71.974    0.0000 
+Residual       2048.923        53         38.659                     
+Total         27090.984        62                                    
+---------------------------------------------------------------------
+
+                                           Parameter Estimates                                             
+----------------------------------------------------------------------------------------------------------
+                     model       Beta    Std. Error    Std. Beta      t        Sig       lower      upper 
+----------------------------------------------------------------------------------------------------------
+               (Intercept)     -2.949         2.960                 -0.996    0.324     -8.886      2.988 
+   district_nameDorchester     -9.976        16.210       -0.160    -0.615    0.541    -42.490     22.538 
+  district_nameEast Boston      3.183         3.211        0.051     0.991    0.326     -3.258      9.624 
+    district_nameHyde Park    -30.348        16.168       -0.357    -1.877    0.066    -62.776      2.080 
+district_nameJamaica Plain      2.152         5.179        0.022     0.416    0.679     -8.235     12.540 
+     district_nameMattapan    -30.403        29.474       -0.488    -1.032    0.307    -89.520     28.714 
+      district_nameRoxbury     27.997        10.297        0.450     2.719    0.009      7.344     48.650 
+ district_nameSouth Boston      3.525         3.127        0.057     1.127    0.265     -2.746      9.796 
+    district_nameSouth End      0.302         3.795        0.005     0.079    0.937     -7.311      7.914 
+                 pct_black     97.303        38.011        1.242     2.560    0.013     21.062    173.545 
+----------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_step_backward_p</span>(ols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                             Stepwise Summary                              
+-------------------------------------------------------------------------
+Step    Variable        AIC        SBC       SBIC        R2       Adj. R2 
+-------------------------------------------------------------------------
+ 0      Full Model    425.856    458.003    236.907    0.92707    0.90772 
+ 1      nhpt_pct      423.857    453.861    234.336    0.92707    0.90957 
+ 2      pct_white     421.930    449.791    231.824    0.92699    0.91124 
+ 3      aian_pct      420.883    446.601    230.076    0.92587    0.91162 
+ 4      asian_pct     420.148    443.723    228.686    0.92437    0.91153 
+-------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.961       RMSE                 5.703 
+R-Squared               0.924       MSE                 38.659 
+Adj. R-Squared          0.912       Coef. Var           29.630 
+Pred R-Squared          0.893       AIC                420.148 
+MAE                     3.790       SBC                443.723 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                                ANOVA                                 
+---------------------------------------------------------------------
+                 Sum of                                              
+                Squares        DF    Mean Square      F         Sig. 
+---------------------------------------------------------------------
+Regression    25042.061         9       2782.451    71.974    0.0000 
+Residual       2048.923        53         38.659                     
+Total         27090.984        62                                    
+---------------------------------------------------------------------
+
+                                           Parameter Estimates                                             
+----------------------------------------------------------------------------------------------------------
+                     model       Beta    Std. Error    Std. Beta      t        Sig       lower      upper 
+----------------------------------------------------------------------------------------------------------
+               (Intercept)     -2.949         2.960                 -0.996    0.324     -8.886      2.988 
+                 pct_black     97.303        38.011        1.242     2.560    0.013     21.062    173.545 
+   district_nameDorchester     -9.976        16.210       -0.160    -0.615    0.541    -42.490     22.538 
+  district_nameEast Boston      3.183         3.211        0.051     0.991    0.326     -3.258      9.624 
+    district_nameHyde Park    -30.348        16.168       -0.357    -1.877    0.066    -62.776      2.080 
+district_nameJamaica Plain      2.152         5.179        0.022     0.416    0.679     -8.235     12.540 
+     district_nameMattapan    -30.403        29.474       -0.488    -1.032    0.307    -89.520     28.714 
+      district_nameRoxbury     27.997        10.297        0.450     2.719    0.009      7.344     48.650 
+ district_nameSouth Boston      3.525         3.127        0.057     1.127    0.265     -2.746      9.796 
+    district_nameSouth End      0.302         3.795        0.005     0.079    0.937     -7.311      7.914 
+----------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Spatial analysis </span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>with_geometry <span class="ot">&lt;-</span> <span class="fu">get_acs</span>(</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">geography =</span> <span class="st">"tract"</span>,</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="fu">c</span>(<span class="at">total_house_units =</span> <span class="st">'B25001_001'</span>),</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="st">"MA"</span>,</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">geometry =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2021</span></span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Getting data from the 2017-2021 5-year ACS</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: • You have not set a Census API key. Users without a key are limited to 500
+queries per day and may experience performance limitations.
+ℹ For best results, get a Census API key at
+http://api.census.gov/data/key_signup.html and then supply the key to the
+`census_api_key()` function to use it throughout your tidycensus session.
+This warning is displayed once per session.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading feature geometry from the Census website.  To cache shapefiles for use in future sessions, set `options(tigris_use_cache = TRUE)`.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |==                                                                    |   3%
+  |                                                                            
+  |====                                                                  |   5%
+  |                                                                            
+  |=====                                                                 |   8%
+  |                                                                            
+  |=======                                                               |  10%
+  |                                                                            
+  |=========                                                             |  13%
+  |                                                                            
+  |===========                                                           |  15%
+  |                                                                            
+  |============                                                          |  18%
+  |                                                                            
+  |==============                                                        |  20%
+  |                                                                            
+  |================                                                      |  23%
+  |                                                                            
+  |====================                                                  |  28%
+  |                                                                            
+  |=====================                                                 |  31%
+  |                                                                            
+  |=======================                                               |  33%
+  |                                                                            
+  |=========================                                             |  36%
+  |                                                                            
+  |==============================                                        |  43%
+  |                                                                            
+  |================================                                      |  45%
+  |                                                                            
+  |=================================                                     |  48%
+  |                                                                            
+  |===================================                                   |  50%
+  |                                                                            
+  |=====================================                                 |  53%
+  |                                                                            
+  |=========================================                             |  58%
+  |                                                                            
+  |==============================================                        |  66%
+  |                                                                            
+  |===================================================                   |  73%
+  |                                                                            
+  |=====================================================                 |  76%
+  |                                                                            
+  |========================================================              |  81%
+  |                                                                            
+  |==========================================================            |  83%
+  |                                                                            
+  |===================================================================   |  96%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co">#map</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>race_data<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"White_alone"</span>, <span class="st">"Black_or_African_American_alone"</span>,</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"American_Indian_and_Alaska_Native_alone"</span>,</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Asian_alone"</span>, <span class="st">"Native_Hawaiian_and_Other_Pacific_Islander_alone"</span>)</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>pivot_race<span class="ot">&lt;-</span>final_df<span class="sc">%&gt;%</span></span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, GEOID_TRACT_20)<span class="sc">%&gt;%</span></span>
+<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(race_data,<span class="at">names_to =</span><span class="st">'ethnicity'</span>,<span class="at">values_to =</span> <span class="st">'population_count'</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()<span class="sc">%&gt;%</span></span>
+<span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ethnicity, GEOID_TRACT_20)<span class="sc">%&gt;%</span></span>
+<span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_population_count =</span> <span class="fu">mean</span>(population_count))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
+ℹ Please use `all_of()` or `any_of()` instead.
+  # Was:
+  data %&gt;% select(race_data)
+
+  # Now:
+  data %&gt;% select(all_of(race_data))
+
+See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'ethnicity'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pivot_race, <span class="at">n =</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 810 × 3
+# Groups:   ethnicity [5]
+    ethnicity                               GEOID_TRACT_20 mean_population_count
+    &lt;chr&gt;                                            &lt;dbl&gt;                 &lt;dbl&gt;
+  1 American_Indian_and_Alaska_Native_alone    25025000102                 111. 
+  2 American_Indian_and_Alaska_Native_alone    25025000201                 111. 
+  3 American_Indian_and_Alaska_Native_alone    25025000202                 111. 
+  4 American_Indian_and_Alaska_Native_alone    25025000301                 111. 
+  5 American_Indian_and_Alaska_Native_alone    25025000302                 111. 
+  6 American_Indian_and_Alaska_Native_alone    25025000401                 111. 
+  7 American_Indian_and_Alaska_Native_alone    25025000402                 111. 
+  8 American_Indian_and_Alaska_Native_alone    25025000502                 111. 
+  9 American_Indian_and_Alaska_Native_alone    25025000503                 111. 
+ 10 American_Indian_and_Alaska_Native_alone    25025000505                 111. 
+ 11 American_Indian_and_Alaska_Native_alone    25025000506                 111. 
+ 12 American_Indian_and_Alaska_Native_alone    25025000601                 111. 
+ 13 American_Indian_and_Alaska_Native_alone    25025000603                 111. 
+ 14 American_Indian_and_Alaska_Native_alone    25025000604                 111. 
+ 15 American_Indian_and_Alaska_Native_alone    25025000701                 111. 
+ 16 American_Indian_and_Alaska_Native_alone    25025010500                  38.6
+ 17 American_Indian_and_Alaska_Native_alone    25025010600                  38.6
+ 18 American_Indian_and_Alaska_Native_alone    25025010701                  38.6
+ 19 American_Indian_and_Alaska_Native_alone    25025010702                  38.6
+ 20 American_Indian_and_Alaska_Native_alone    25025010801                  38.6
+ 21 American_Indian_and_Alaska_Native_alone    25025010802                  38.6
+ 22 American_Indian_and_Alaska_Native_alone    25025050101                 313. 
+ 23 American_Indian_and_Alaska_Native_alone    25025050200                 313. 
+ 24 American_Indian_and_Alaska_Native_alone    25025050300                 313. 
+ 25 American_Indian_and_Alaska_Native_alone    25025050400                 313. 
+ 26 American_Indian_and_Alaska_Native_alone    25025050500                 313. 
+ 27 American_Indian_and_Alaska_Native_alone    25025050600                 313. 
+ 28 American_Indian_and_Alaska_Native_alone    25025050700                 313. 
+ 29 American_Indian_and_Alaska_Native_alone    25025050901                 313. 
+ 30 American_Indian_and_Alaska_Native_alone    25025051000                 313. 
+ 31 American_Indian_and_Alaska_Native_alone    25025051101                 313. 
+ 32 American_Indian_and_Alaska_Native_alone    25025051200                 313. 
+ 33 American_Indian_and_Alaska_Native_alone    25025060101                  44.7
+ 34 American_Indian_and_Alaska_Native_alone    25025060200                  44.7
+ 35 American_Indian_and_Alaska_Native_alone    25025060301                  44.7
+ 36 American_Indian_and_Alaska_Native_alone    25025060400                  44.7
+ 37 American_Indian_and_Alaska_Native_alone    25025060501                  44.7
+ 38 American_Indian_and_Alaska_Native_alone    25025060601                  44.7
+ 39 American_Indian_and_Alaska_Native_alone    25025060602                  44.7
+ 40 American_Indian_and_Alaska_Native_alone    25025060700                  44.7
+ 41 American_Indian_and_Alaska_Native_alone    25025060800                  44.7
+ 42 American_Indian_and_Alaska_Native_alone    25025061000                  44.7
+ 43 American_Indian_and_Alaska_Native_alone    25025061101                  44.7
+ 44 American_Indian_and_Alaska_Native_alone    25025061201                  44.7
+ 45 American_Indian_and_Alaska_Native_alone    25025061202                 145. 
+ 46 American_Indian_and_Alaska_Native_alone    25025061203                  44.7
+ 47 American_Indian_and_Alaska_Native_alone    25025061204                  44.7
+ 48 American_Indian_and_Alaska_Native_alone    25025070102                  20.2
+ 49 American_Indian_and_Alaska_Native_alone    25025070103                  20.2
+ 50 American_Indian_and_Alaska_Native_alone    25025070104                  72.5
+ 51 American_Indian_and_Alaska_Native_alone    25025070201                  38.6
+ 52 American_Indian_and_Alaska_Native_alone    25025070202                  29.4
+ 53 American_Indian_and_Alaska_Native_alone    25025070301                  38.6
+ 54 American_Indian_and_Alaska_Native_alone    25025070302                  38.6
+ 55 American_Indian_and_Alaska_Native_alone    25025070402                  91.8
+ 56 American_Indian_and_Alaska_Native_alone    25025070501                 145. 
+ 57 American_Indian_and_Alaska_Native_alone    25025070502                 145. 
+ 58 American_Indian_and_Alaska_Native_alone    25025070600                  91.8
+ 59 American_Indian_and_Alaska_Native_alone    25025070700                  38.6
+ 60 American_Indian_and_Alaska_Native_alone    25025070801                 145. 
+ 61 American_Indian_and_Alaska_Native_alone    25025070802                 145. 
+ 62 American_Indian_and_Alaska_Native_alone    25025070901                 145. 
+ 63 American_Indian_and_Alaska_Native_alone    25025070902                 145. 
+ 64 American_Indian_and_Alaska_Native_alone    25025071101                 145. 
+ 65 American_Indian_and_Alaska_Native_alone    25025071201                 145. 
+ 66 American_Indian_and_Alaska_Native_alone    25025080100                 282. 
+ 67 American_Indian_and_Alaska_Native_alone    25025080300                 301. 
+ 68 American_Indian_and_Alaska_Native_alone    25025080401                 177. 
+ 69 American_Indian_and_Alaska_Native_alone    25025080500                 177. 
+ 70 American_Indian_and_Alaska_Native_alone    25025080601                 177. 
+ 71 American_Indian_and_Alaska_Native_alone    25025080801                  57.4
+ 72 American_Indian_and_Alaska_Native_alone    25025080900                  57.4
+ 73 American_Indian_and_Alaska_Native_alone    25025081001                  57.4
+ 74 American_Indian_and_Alaska_Native_alone    25025081101                 169. 
+ 75 American_Indian_and_Alaska_Native_alone    25025081102                  65.5
+ 76 American_Indian_and_Alaska_Native_alone    25025081200                 169. 
+ 77 American_Indian_and_Alaska_Native_alone    25025081301                 301. 
+ 78 American_Indian_and_Alaska_Native_alone    25025081302                 301. 
+ 79 American_Indian_and_Alaska_Native_alone    25025081400                 179. 
+ 80 American_Indian_and_Alaska_Native_alone    25025081500                 301. 
+ 81 American_Indian_and_Alaska_Native_alone    25025081700                 301. 
+ 82 American_Indian_and_Alaska_Native_alone    25025081800                 214. 
+ 83 American_Indian_and_Alaska_Native_alone    25025081900                 214. 
+ 84 American_Indian_and_Alaska_Native_alone    25025082000                  60.2
+ 85 American_Indian_and_Alaska_Native_alone    25025082100                  60.2
+ 86 American_Indian_and_Alaska_Native_alone    25025090100                  60.2
+ 87 American_Indian_and_Alaska_Native_alone    25025090200                  60.2
+ 88 American_Indian_and_Alaska_Native_alone    25025090300                 122. 
+ 89 American_Indian_and_Alaska_Native_alone    25025090400                 206. 
+ 90 American_Indian_and_Alaska_Native_alone    25025090600                 259. 
+ 91 American_Indian_and_Alaska_Native_alone    25025090700                 163. 
+ 92 American_Indian_and_Alaska_Native_alone    25025090901                 184. 
+ 93 American_Indian_and_Alaska_Native_alone    25025091001                 113. 
+ 94 American_Indian_and_Alaska_Native_alone    25025091100                 184. 
+ 95 American_Indian_and_Alaska_Native_alone    25025091200                 184. 
+ 96 American_Indian_and_Alaska_Native_alone    25025091300                 184. 
+ 97 American_Indian_and_Alaska_Native_alone    25025091400                 184. 
+ 98 American_Indian_and_Alaska_Native_alone    25025091500                 113. 
+ 99 American_Indian_and_Alaska_Native_alone    25025091600                  41.2
+100 American_Indian_and_Alaska_Native_alone    25025091700                  41.2
+# ℹ 710 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>boston_local_seg <span class="ot">&lt;-</span> pivot_race <span class="sc">%&gt;%</span></span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutual_local</span>(</span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="st">"ethnicity"</span>,</span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">unit =</span> <span class="st">"GEOID_TRACT_20"</span>,</span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="st">"mean_population_count"</span>, </span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">wide =</span> <span class="cn">TRUE</span></span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">%&gt;%</span></span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">GEOID =</span> GEOID_TRACT_20)</span>
+<span id="cb98-9"><a href="#cb98-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-10"><a href="#cb98-10" aria-hidden="true" tabindex="-1"></a>boston_local_seg<span class="sc">$</span>GEOID<span class="ot">&lt;-</span><span class="fu">as.character</span>(boston_local_seg<span class="sc">$</span>GEOID)</span>
+<span id="cb98-11"><a href="#cb98-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-12"><a href="#cb98-12" aria-hidden="true" tabindex="-1"></a>with_geometry <span class="ot">&lt;-</span> <span class="fu">get_acs</span>(</span>
+<span id="cb98-13"><a href="#cb98-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">geography =</span> <span class="st">"tract"</span>,</span>
+<span id="cb98-14"><a href="#cb98-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="fu">c</span>(<span class="at">total_house_units =</span> <span class="st">'B25001_001'</span>),</span>
+<span id="cb98-15"><a href="#cb98-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="st">"MA"</span>,</span>
+<span id="cb98-16"><a href="#cb98-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">geometry =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb98-17"><a href="#cb98-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2021</span></span>
+<span id="cb98-18"><a href="#cb98-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Getting data from the 2017-2021 5-year ACS
+Downloading feature geometry from the Census website.  To cache shapefiles for use in future sessions, set `options(tigris_use_cache = TRUE)`.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>MA_tracts_seg <span class="ot">&lt;-</span> <span class="fu">tracts</span>(<span class="st">"MA"</span>, <span class="at">cb =</span> <span class="cn">TRUE</span>, <span class="at">year =</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(boston_local_seg, <span class="at">by =</span> <span class="st">"GEOID"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |==                                                                    |   2%
+  |                                                                            
+  |======                                                                |   9%
+  |                                                                            
+  |========                                                              |  11%
+  |                                                                            
+  |=============                                                         |  18%
+  |                                                                            
+  |===================                                                   |  27%
+  |                                                                            
+  |=====================                                                 |  29%
+  |                                                                            
+  |===========================                                           |  38%
+  |                                                                            
+  |===============================                                       |  45%
+  |                                                                            
+  |=================================                                     |  47%
+  |                                                                            
+  |===================================                                   |  49%
+  |                                                                            
+  |=========================================                             |  58%
+  |                                                                            
+  |==========================================                            |  61%
+  |                                                                            
+  |==============================================                        |  65%
+  |                                                                            
+  |=================================================                     |  70%
+  |                                                                            
+  |=====================================================                 |  76%
+  |                                                                            
+  |=======================================================               |  79%
+  |                                                                            
+  |=============================================================         |  88%
+  |                                                                            
+  |==================================================================    |  94%
+  |                                                                            
+  |====================================================================  |  97%
+  |                                                                            
+  |===================================================================== |  99%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>MA_tracts_seg<span class="sc">%&gt;%</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> ls)) <span class="sc">+</span> </span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span> </span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">crs =</span> <span class="fu">st_crs</span>(with_geometry))<span class="sc">+</span></span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">"inferno"</span>) <span class="sc">+</span> </span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span> </span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Local</span><span class="sc">\n</span><span class="st">segregation index"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Analysis_page_files/figure-html/unnamed-chunk-1-23.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Geo weighted Regression </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
