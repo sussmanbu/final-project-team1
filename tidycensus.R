@@ -68,7 +68,7 @@ fetch_acs_data <- function(year, zips) {
                                Asian_alone = 'B02001_005',
                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006',
                                aggregate_time_to_work = 'B08131_001'
-                               ),
+                 ),
                  zip = "MA", 
                  year = year)
   
@@ -168,7 +168,6 @@ saveRDS(merge_geometry, "all_census_dat.rdr")
 
 final_df<-readRDS('all_census_dat.rdr')
 
-#write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)
 
 library(tidycensus)
 library(tidyverse)
@@ -183,17 +182,64 @@ library(olsrr)
 
 #shows correlation between income and total cases for each district. Lower income => more cases 
 
+#correlation table for all independent variables
+independent_dat<-final_df%>%
+  group_by(district_name)%>%
+  summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),
+            nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), 
+            asian_pct = mean(Asian_alone/total_pop),
+            pct_black = mean(Black_or_African_American_alone/total_pop),
+            pct_white = mean(White_alone/total_pop),
+            unemployment=mean(not_in_labor_force/total_pop),
+            medincome_mean= mean(household_medincome),
+            bachelors = mean(bachelors_25/total_pop),
+            one_parent= mean(one_parent/total_house_units),
+            married_house= mean(married_households/total_house_units),
+            vacant_houses = mean(vacancy_status/total_house_units),
+            total_cases = sum(!duplicated(incident_num)))%>%
+  select(-district_name,-total_cases)
+
+dependent_dat<-final_df%>%
+  group_by(district_name)%>%
+  summarise(total_cases = sum(!duplicated(incident_num)))
+
+correlation_coeffs <- cor(dependent_dat$total_cases, independent_dat)
+
+variable_names <- colnames(independent_dat)
+correlation_values <- as.vector(correlation_coeffs)
+
+correlation_df <- data.frame(
+  Variable = variable_names,
+  Correlation_Coefficient = correlation_values
+)
+print(correlation_df)
+
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  na.omit(aggregate_time_to_work)%>%
+  summarise(travel_time= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(total_cases, travel_time),2))
+
+new_row <- data.frame(
+  Variable = "time_to_work",
+  Correlation_Coefficient = -0.62
+)
+correlation_df <- rbind(correlation_df, new_row)
+correlation_df$Correlation_Coefficient <- round(correlation_df$Correlation_Coefficient, 2)
+
+#correlation dataframe visual 
+
+
 #time to work plot 
-
-
 final_df%>%
-  group_by(district_name,year)%>%
+  group_by(district_name)%>%
   na.omit(aggregate_time_to_work)%>%
   summarise(work_time= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes( work_time,total_cases))+
   geom_point()+
   geom_smooth(method ='lm')+
   labs(y = 'Avg travel time to work',title = 'Avg Travel Time to Work and Total Cases')
+
 
 #income plot
 correlation_coef <- final_df%>%
@@ -273,7 +319,9 @@ final_df%>%
   ggplot(aes(district_name,total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title = 'Total Cases by District')
+  labs(title = 'Total Cases by District 2015-2022', x = 'Total Cases', y = 'District Name')+
+  theme(panel.background = element_blank())
+
 
 #single parent household plot
 correlation_coef <- final_df%>%
@@ -321,7 +369,6 @@ final_df%>%
   geom_smooth(method ='lm')
 
 #vacant househomes
-
 correlation_coef <- final_df%>%
   group_by(district_name)%>%
   summarise(vaccant_house = mean(vacancy_status/total_house_units),total_cases = sum(!duplicated(incident_num))) %>%
@@ -343,7 +390,7 @@ final_df%>%
   geom_point()+
   geom_smooth(method ='lm')
 
-
+#data is not aggregated over all years, gives more variance to regressors for proper summary stats
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
   summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),
@@ -360,6 +407,8 @@ lm_dat<-final_df%>%
             travel_work = mean(aggregate_time_to_work),
             total_cases = sum(!duplicated(incident_num)))
 
+
+
 #OLS with all variables 
 ols<-lm(total_cases~travel_work+ pct_white+pct_black+asian_pct+nhpt_pct+aian_pct+district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
@@ -370,13 +419,16 @@ ols_step_forward_p(ols) #forward and backwards variable selection
 ols_step_backward_p(ols)
 
 #OLS socieoeconomic variables 
-ols<-lm(total_cases~ travel_work+unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
+ols<-lm(total_cases~ travel_work+ unemployment+medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
 vif(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 plot(ols)
+#interpretation: most significant socieoeconomic variables: travel work, vaccant_houses, married houses are all significant 5% level 
+
+
 
 #OLS race and socieoeconomic variables
 ols<-lm(total_cases~ asian_pct+pct_white+pct_black+nhpt_pct+aian_pct+travel_work+unemployment +medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
@@ -386,6 +438,9 @@ vif(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 plot(ols)
+#interpretation: asian_pct, pc_white, bachelors, medium income, are significant at 5% level, 
+#one_parent, travel_work significant at 10%
+
 
 #OLS socieoeconomic and location
 ols<-lm(total_cases~travel_work+district_name+ unemployment+ medincome_mean+bachelors+one_parent+vacant_houses+married_house, data = lm_dat)
@@ -394,6 +449,7 @@ summary(ols)
 vif(ols)
 ols_step_forward_p(ols)
 ols_step_backward_p(ols)
+#married house, 
 
 #OLS race and location
 ols<-lm(total_cases~ pct_white+pct_black+asian_pct+nhpt_pct+aian_pct+district_name, data = lm_dat)
@@ -404,13 +460,16 @@ ols_step_forward_p(ols)
 ols_step_backward_p(ols)
 
 
-#Spatial analysis 
+#OLS interaction, 
+ols<-lm(total_cases~ pct_white+pct_black+asian_pct+asian_pct*bachelor++nhpt_pct+aian_pct+district_name, data = lm_dat)
 
+
+#Spatial analysis 
 
 #map
 race_data<-c("White_alone", "Black_or_African_American_alone",
-  "American_Indian_and_Alaska_Native_alone",
-  "Asian_alone", "Native_Hawaiian_and_Other_Pacific_Islander_alone")
+             "American_Indian_and_Alaska_Native_alone",
+             "Asian_alone", "Native_Hawaiian_and_Other_Pacific_Islander_alone")
 
 
 pivot_race<-final_df%>%
@@ -433,10 +492,16 @@ boston_local_seg <- pivot_race %>%
 
 boston_local_seg$GEOID<-as.character(boston_local_seg$GEOID)
 
-
-
 MA_tracts_seg <- tracts("MA", cb = TRUE, year = 2020) %>%
   inner_join(boston_local_seg, by = "GEOID") 
+
+with_geometry <- get_acs(
+  geography = "tract",
+  variables = c(total_house_units = 'B25001_001'),
+  state = "MA",
+  geometry = TRUE,
+  year = 2021
+)
 
 MA_tracts_seg%>%
   ggplot(aes(fill = ls)) + 
@@ -445,14 +510,19 @@ MA_tracts_seg%>%
   scale_fill_viridis_c(option = "inferno") + 
   theme_void() + 
   labs(fill = "Local\nsegregation index")
-  
-#Geo weighted Regression 
 
+#Geography weighted Regression 
+
+#Implemented with the GWmodel R package and spgwr package that offer a methods for a geographical robust weighted regreession
+# The GWR model computes a local regression model for each location, while including a distance decay function, or a weight added to sum of linear combinations which specifies how observations outside the current location will be weighted
+# relative to their distance. A kernel bandwith is implemented to determine the cutoff distnace for observations that will be included for a locations set of linear combinations
+# The GWR model returns local parameter estimates, and the local R-squared quatifying how much variance was captured in a given area. We plot the R-squared statistic for each location in our data below
+#
 
 library(GWmodel)
 
-lm_dat<-final_df%>%
-  group_by(district_name, year)%>%
+geo_dat<-final_df%>%
+  group_by(district_name,year)%>%
   summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),
             nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), 
             asian_pct = mean(Asian_alone/total_pop),
@@ -465,128 +535,50 @@ lm_dat<-final_df%>%
             married_house= mean(married_households/total_house_units),
             vacant_houses = mean(vacancy_status/total_house_units),
             travel_work = mean(aggregate_time_to_work),
-            total_cases = sum(!duplicated(incident_num)))
+            total_cases = sum(!duplicated(incident_num)),
+            geometry = geometry)%>%
+  distinct()
 
+geo_reg<-st_as_sf(geo_dat)%>%
+  as_Spatial()
 
-with_geometry <- get_acs(
-  geography = "tract",
-  variables = c(total_house_units = 'B25001_001'),
-  state = "MA",
-  geometry = TRUE,
-  year = 2021
+formula2 <- "total_cases~ travel_work"
+
+bw <- bw.gwr(
+  formula = formula2, 
+  data = geo_reg, 
+  kernel = "bisquare",
+  adaptive = TRUE
 )
-
-
-spatial_dat<-get_acs(
-  geography='tract',
-  variables = c(percent_ooh = "DP04_0046P"),
-  state = 'MA',
-  geometry = TRUE,
-  year =2020
-)%>%
-st_transform(st_crs(with_geometry))
-
-spatial_dat%>%
-  as_Spatial()
-
-
-formula2 <- "lm(total_cases~ unemployment +medincome_mean+bachelors+one_parent+married_house, data = roxbury_lm_dat)"
-
-dfw_data_sp <- lm_dat %>%
-  as_Spatial()
-
 
 gw_model <- gwr.basic(
   formula = formula2, 
-  data = lm_dat, 
+  data = geo_reg, 
   bw = bw,
   kernel = "bisquare",
   adaptive = TRUE
 )
 
-#time series forecast:
-library(dynlm)
-unloadNamespace('dyplr')
+gw_model_results <- gw_model$SDF %>%
+  st_as_sf() 
 
-final_df%>%
-  group_by(year)%>%
-  summarise(total_cases = sum(!duplicated(incident_num)))%>%
-  ggplot(aes(year, total_cases))+
-  geom_line()
+#map for R^2
+ggplot(gw_model_results, aes(fill = Local_R2)) + 
+  geom_sf(color = NA) + 
+  scale_fill_viridis_c() + 
+  theme_void()
 
-lm_dat<-final_df%>%
-  group_by(year)%>%
-  summarise(unemployment=mean(not_in_labor_force/total_pop),medincome_mean= mean(medincome),bachelors = mean(bacehelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),married_house= mean(married_households/total_house_units),vacant_houses = mean(vacancy_status/total_house_units),
-            total_cases = sum(!duplicated(incident_num)))
-
-unempl_zoo = as.zoo(lm_dat$unemployment)
-total_zoo = as.zoo(lm_dat$total_cases)
-parent_zoo = as.zoo(lm_dat$one_parent)
-
-reg1 <- dynlm(log(total_zoo) ~ L(log(total_zoo),1:2)+L(log(unempl_zoo),1), data = lm_dat )
-
-test1 <- coeftest(reg1, vcov = vcovHAC)
-print(test1)
-
-out1 = data.frame( t = 0:18, Impact = reg1$coef[2:4], UB = reg1$coef[2:4] + 1.96*test1[2:4,2], LB = reg1$coef[2:4] - 1.96*test1[2:4,2] )
-
-FOJC_pctc = as.zoo(FOJC_pctc)
-FDD = as.zoo(FDD) 
-
-selected_columns$Date<-as.Date(selected_columns$Date)
-
-count_dates<-selected_columns%>%
-  mutate(month_year =format(Date, "%Y-%m"))%>%
-  group_by(month_year)%>%
-  summarize(unique_dates = rev(unique(month_year)))
-
-print(count_dates,n=200)
+#map for beta, choose the fill variable/beta coefficient 
+ggplot(gw_model_results, aes(fill = one_parent)) + 
+  geom_sf(color = NA) + 
+  scale_fill_viridis_c() + 
+  theme_void() + 
+  labs(fill = "Local β for \some regressor")
 
 
 
 
-#update variables for these years 
 
-dat_2023<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",no_english = "B16004_005E",little_english = "B16004_004E",
-                                has_highschool_diploma ="B15003_017E",employment_status = "B23025_001E",
-                                pct_below_poverty_level = "B17001_002E",pct_homes_owner_occupied = "DP04_0046PE",
-                                total_pop = "B02001_002E", White_alone = "B02001_002E", Black_or_African_American_alone = "B02001_003E",
-                                American_Indian_and_Alaska_Native_alone = "B02001_004E",Asian_alone = "B02001_005E", 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = "B02001_006E", pct_25_and_up_bachelors_degree = "DP02_0068P"),
-                  
-                  zip = "MA", 
-                  year = 2023)
-
-
-df_2023<- dat_2023 %>%
-  pivot_wider(
-    id_cols = c(GEOID, NAME),
-    names_from = variable,
-    values_from = estimate
-  ) %>%
-  mutate(year = 2023)
-
-
-dat_2024<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",no_english = 'B16004_005E',little_english = 'B16004_004E',
-                                has_highschool_diploma ='B16010_002',employment_status = 'B23025_001',
-                                pct_below_poverty_level = 'B06012_002',pct_vacant = 'B25004_001',
-                                total_pop = 'B01003_001', White_alone = 'B02001_002E', Black_or_African_American_alone = 'B02001_003E',
-                                American_Indian_and_Alaska_Native_alone = 'B02001_004E',Asian_alone = 'B02001_005E', 
-                                Native_Hawaiian_and_Other_Pacific_Islander_alone = 'B02001_006E', pct_25_and_up_bachelors_degree = 'DP02_0068P',one_parent = 'B23008_021'),
-                
-                  zip = "MA", 
-                  year = 2024)
-
-df_2024 <- dat_2024 %>%
-  pivot_wider(
-    id_cols = c(GEOID, NAME),
-    names_from = variable,
-    values_from = estimate
-  ) %>%
-  mutate(year = 2024)
 
 
 
