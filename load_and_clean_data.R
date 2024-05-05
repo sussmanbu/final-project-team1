@@ -40,6 +40,10 @@ shooting_data <- shooting_data %>%
 shooting_data <- shooting_data %>%
   select(-shooting_type_v2)
 
+#add v_hispanic_or_latinx to victim_race
+shooting_data <- shooting_data %>%
+  mutate(victim_race = ifelse(v_hispanic_or_latinx == TRUE, "Hispanic or Latinx", victim_race))
+
 #list of districts
 district_mapping <- c("A1"="Downtown", "A15"="Charlestown", "A7"="East Boston", "B2"="Roxbury", "B3"="Mattapan", "C6"="South Boston", "C11"="Dorchester", "D4"="South End", "D14"="Brighton", "E5"="West Roxbury", "E13"="Jamaica Plain", "E18"="Hyde Park")
 
