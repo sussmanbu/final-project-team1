@@ -1,65 +1,154 @@
 ---
-title: "Big Picture"
-description: "A 538/Upshot style article about the data."
+title: "Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?"
+description: ""
 toc: true
 draft: FALSE
+editor: 
+  markdown: 
+    wrap: sentence
 ---
+
+``` {r echo = FALSE}
+suppressPackageStartupMessages({
+  final_df <- readRDS('all_census_dat.rdr')
+
+  #write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)
+
+  library(tidycensus)
+  library(tidyverse)
+  library(sandwich)
+  library(lmtest)
+  library(car)
+  library(leaps)
+  library(segregation)
+  library(tigris)
+  library(sf)
+  library(olsrr)
+})
+
+```
 
 ![](images/The_Big_Picture_2.jpeg)
 
-This comes from the file `big_picture.Rmd`.
+In the heart of Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods.
+But what factors contribute to this grave issue?
+Our comprehensive analysis over the past decade seeks to uncover whether socioeconomic status could be the central factor in understanding and perhaps mitigating this violence.
 
-Think of this page as your 538/Upshot style article. This means that you should try to tell a story through the data and your analysis. Read articles from those sites and similar sites to get a feeling for what they are like. Try to write in the style of a news or popular article. Importantly, this pge should be geared towards the general public. You shouldn't assume the reader understands how to interpret a linear regression. Focus on interpretation and visualizations.
+At the center of our study is a hypothesis: **Add final hypothesis**.
+By examining data from various neighborhoods, we explore how income, employment, education and race relate to the frequency of shootings.
 
----
+## **Visual Analysis: The Story Through Numbers**
 
-## Rubric: On this page
-
-You will
-
-* Title
-  * Your big picture page should have a creative/click-bait-y title/headline that provides a hint about your thesis.
-* Clarity of Explanation
-  * You should have a clear thesis/goal for this page. What are you trying to show? Make sure that you explain your analysis in detail but don't go into top much mathematics or statistics. The audience for this page is the general public (to the extent possible). Your thesis should be a statement, not a question.
-  * Each figure should be very polished and also not too complicated. There should be a clear interpretation of the figure so the figure has a clear purpose. Even something like a histogram can be difficult to interpret for non-experts.
-* Creativity
-  * Do your best to make things interesting. Think of a story. Think of how each part of your analysis supports the previous part or provides a different perspective.
-* This page should be self-contained.
-  
-**Note**: This page should have no code visible, i.e. use `#| echo: FALSE`.  
-
----
-
-## Rubric: Other components
-
-### Interactive
-
-You will also be required to make an interactive dashboard like [this one](/flex/flex.html).
-
-Your Big Data page should include a link to an interactive dashboard. The dashboard should be created either using Shiny or FlexDashboard (or another tool with professor's approval). This interactive component should in some way support your thesis from your big picture page. Good interactives often provide both high-level understanding of the data while allowing a user to investigate specific scenarios, observations, subgroups, etc.
-
-* Quality and ease of use of the interactive components.
-Is it clear what can be explored using your interactive components?
-Does it enhance and reinforce your conclusions from the Big Picture?
-Plotly with default hover text will get no credit. Be creative!
+#### **Neighborhood Impact: Boston's Safety Divide**
 
 
-### Video Recording
+``` {r echo=FALSE}
+#total cases for districts plot
+final_df%>%
+  group_by(district_name)%>%
+  summarise(total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name,total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(title = 'Total Cases by District')
+```
+The distribution of gun violence across Boston reveals significant disparities that echo through its neighborhoods.
+The bar chart above showcases the total number of shooting incidents by district, highlighting a varied landscape of safety across the city.
+Notably, districts like Mattapan, Roxbury and Dorchester experience far higher frequencies of violence compared to quieter areas like the East Boston and Brighton.
+This visualization not only illustrates these differences but sets the stage for a deeper exploration of underlying causes. What can these variations tell us about the resources and challenges faced by residents of different districts?
 
-Make a video recording (probably using Zoom) demonstrating your interactive components.
-You should provide a quick explanation of your data and demonstrate some of the conclusions from your EDA.
-This video should be no longer than 4 minutes.
-Include a link to your video (and password if needed) in your README.md file on your Github repository. You are not required to provide a link on the website.
-This can be presented by any subset of the team members.
+#### **The Relationship Between Income and Safety**
+
+As we delve deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability.
+In this section, we examine how the average median income across Boston's neighborhoods correlates with the number of shooting incidents they experience.
+The upcoming graph will visually showcase this relationship, revealing how economic conditions might directly influence the safety and wellbeing of residents.
+
+``` {r echo=FALSE}
+#income plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(total_cases, medincome_mean),2)) 
+#scatterplot with line of best fit 
+final_df%>%
+  group_by(district_name)%>%
+  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes( medincome_mean,total_cases))+
+  geom_point()+
+  geom_smooth(method ='lm')+
+  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+```
+
+The graph presents a compelling narrative, where districts with higher average median incomes typically report fewer shooting incidents.
+This moderate inverse relationship highlights economic stability as a potential buffer against violence.
+
+``` {r echo=FALSE}
+
+#income plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  summarise(correlation_coef = round(cor(total_cases, medincome_mean),2))
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, medincome_mean,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+```
+Notably, neighborhoods like South Boston and the South End, which feature higher income levels, also exhibit lower rates of gun violence, contrasting sharply with areas like Mattapan and Roxbury.
+These findings suggest that improving economic conditions in lower-income districts could be a key strategy in reducing violence.
+
+#### **Employment Status—A Safety Indicator?**
+
+Turning our focus to employment, we examine another vital socioeconomic indicator that may significantly influence urban safety: unemployment rates across Boston's districts. The following graph presents the correlation between average unemployment rates and the total number of shooting incidents, offering insights into how joblessness might exacerbate the risks of violence. With a correlation coefficient of 0.49, the data suggest a substantial link between higher unemployment and increased shooting incidents, hinting that employment stability could be a pivotal factor in enhancing community safety.
+
+``` {r echo=FALSE}
+#not in labor force plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(unemployment_pct= mean(not_in_labor_force/total_pop), total_cases = sum(!duplicated(incident_num)))%>%
+  summarise(correlation_coef = round(cor(total_cases, unemployment_pct),2))
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(unemployment_pct= mean(not_in_labor_force/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, unemployment_pct,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Pct Unemployed',title = 'Avg Unemployment and Total Cases')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+```
+The graph depicts a clear trend where districts with higher unemployment rates, such as Mattapan and Roxbury, also report a greater number of shooting incidents. This visualization highlights the potential role of economic distress, manifesting as unemployment, in contributing to social instability and violence. Particularly striking is the high unemployment and corresponding high number of cases in Mattapan, underscoring the urgency for targeted economic and employment support in such areas. On the other hand, districts like South Boston and the South End, which feature relatively lower unemployment rates, witness fewer shootings, supporting the theory that job creation and economic vitality might serve as effective deterrents to violence. This data not only enhances our understanding of the socioeconomic underpinnings of gun violence but also underscores the importance of employment initiatives as a strategy for crime prevention and community development.
+
+#### **Educational Attainment and Community Safety**
+
+Education shines through as a potential beacon of hope. Districts with higher percentages of bachelor's degree holders, such as Brighton and the South End, report fewer violent episodes. This trend is visually represented and suggests that enhancing educational opportunities could serve as a preventive measure against urban violence.
+
+``` {r echo=FALSE}
+
+#Bachelors degree plot
+correlation_coef <- final_df%>%
+  group_by(district_name)%>%
+  summarise(pct_not_enrolled= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num)))%>%
+  summarise(correlation_coef = round(cor(total_cases, pct_not_enrolled),2))
+
+final_df%>%
+  group_by(district_name)%>%
+  summarise(pct_bachelors= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
+  ggplot(aes(district_name, pct_bachelors,fill = total_cases))+
+  geom_bar(stat= 'identity')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(y = 'Pct of Population with Bachelors ',title = 'Bachelors Degree and Total Cases')+
+  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
+```
+The above graph illustrates the percentage of the population with bachelor’s degrees by district alongside the total number of shooting cases. It is evident that districts like Brighton and South Boston, which boast higher percentages of degree holders, report significantly fewer shootings compared to areas like Mattapan and Dorchester, where fewer residents have completed higher education. This visual trend is supported by the correlation coefficient, reinforcing the idea that education may serve as a protective factor against violence.
 
 
-### Rest of the Site
+#### **Racial Disparities and Fatal Outcomes**
 
-Finally, here are important things to keep in mind for the rest of the site. 
 
-The main title of your page is informative.
-Each post has an author/description/informative title.
-All lab required posts are present.
-Each page (including the home page) has a nice featured image associated with it.
-Your about page is up to date and clean.
-You have removed the generic posts from the initial site template.
