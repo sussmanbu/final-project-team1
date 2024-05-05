@@ -238,8 +238,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidycensus)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#analysis summary: focus on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Outline: </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#summary statistics: correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books. </span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Modeling: good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, where is our regressors more impactful?, compare to segregation index and map. </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidycensus)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
@@ -576,7 +582,7 @@ district_nameJamaica Plain     -39.413        16.384       -0.419    -2.406    0
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">#attempted variable selection, all the districts were retained, hence their predictive power, travel_work, income, married households also selected based on their significance, </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#socieo economic and race </span></span>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#socio economic and race </span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span> asian_pct<span class="sc">+</span>pct_white<span class="sc">+</span>pct_black<span class="sc">+</span>nhpt_pct<span class="sc">+</span>aian_pct<span class="sc">+</span>travel_work<span class="sc">+</span>unemployment<span class="sc">+</span>medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat)</span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -834,11 +840,15 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   |                                                                            
   |==========                                                            |  14%
   |                                                                            
-  |===========                                                           |  16%
+  |=============                                                         |  18%
   |                                                                            
   |==============                                                        |  20%
   |                                                                            
   |=================                                                     |  25%
+  |                                                                            
+  |===================                                                   |  27%
+  |                                                                            
+  |=====================                                                 |  29%
   |                                                                            
   |======================                                                |  32%
   |                                                                            
@@ -846,17 +856,21 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   |                                                                            
   |===========================                                           |  38%
   |                                                                            
-  |============================                                          |  40%
+  |==============================                                        |  43%
   |                                                                            
-  |====================================                                  |  52%
+  |===============================                                       |  45%
+  |                                                                            
+  |=================================                                     |  47%
+  |                                                                            
+  |===================================                                   |  49%
   |                                                                            
   |=======================================                               |  56%
   |                                                                            
   |=========================================                             |  58%
   |                                                                            
-  |==========================================                            |  61%
-  |                                                                            
   |============================================                          |  63%
+  |                                                                            
+  |==============================================                        |  65%
   |                                                                            
   |=================================================                     |  70%
   |                                                                            
@@ -866,15 +880,13 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   |                                                                            
   |=========================================================             |  81%
   |                                                                            
-  |============================================================          |  85%
+  |=============================================================         |  88%
   |                                                                            
   |===============================================================       |  90%
   |                                                                            
+  |=================================================================     |  92%
+  |                                                                            
   |==================================================================    |  94%
-  |                                                                            
-  |====================================================================  |  97%
-  |                                                                            
-  |===================================================================== |  99%
   |                                                                            
   |======================================================================| 100%</code></pre>
 </div>
@@ -908,8 +920,6 @@ This warning is displayed once per session.</code></pre>
   |                                                                            
   |====                                                                  |   5%
   |                                                                            
-  |=====                                                                 |   8%
-  |                                                                            
   |=======                                                               |  10%
   |                                                                            
   |=========                                                             |  13%
@@ -918,9 +928,9 @@ This warning is displayed once per session.</code></pre>
   |                                                                            
   |============                                                          |  18%
   |                                                                            
-  |==============                                                        |  20%
-  |                                                                            
   |================                                                      |  23%
+  |                                                                            
+  |==================                                                    |  25%
   |                                                                            
   |====================                                                  |  28%
   |                                                                            
@@ -932,17 +942,15 @@ This warning is displayed once per session.</code></pre>
   |                                                                            
   |==============================                                        |  43%
   |                                                                            
-  |=================================                                     |  48%
+  |=====================================                                 |  53%
   |                                                                            
-  |=======================================================               |  78%
+  |=======================================                               |  55%
   |                                                                            
-  |==========================================================            |  83%
+  |========================================================              |  81%
   |                                                                            
   |==============================================================        |  88%
   |                                                                            
   |=================================================================     |  93%
-  |                                                                            
-  |===================================================================   |  96%
   |                                                                            
   |======================================================================| 100%</code></pre>
 </div>
@@ -968,7 +976,7 @@ This warning is displayed once per session.</code></pre>
 <span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="co">#best data to run this is just socieo economic,</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="co">#best data to run this is just socio economic,</span></span>
 <span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>ols<span class="ot">&lt;-</span><span class="fu">lm</span>(total_cases<span class="sc">~</span> unemployment<span class="sc">+</span>medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span> vacant_houses<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat)</span>
 <span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(ols, <span class="at">vcov. =</span> vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
