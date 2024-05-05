@@ -60,6 +60,65 @@ Notably, districts like Mattapan, Roxbury and Dorchester experience far higher f
 This visualization not only illustrates these differences but sets the stage for a deeper exploration of underlying causes.
 What can these variations tell us about the resources and challenges faced by residents of different districts?
 
+#### **Racial Disparities and Fatal Outcomes**
+
+
+Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. 
+The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and "Unknown" consistently have an extremely low number of victims. It is worth nothing that there do not appear to be any recorded Asian fatalities. It is also worth nothing that for Black and African American, Hispanic or Latinx, and Unknown, there is a notable spike in Non-Fatal incidents in 2020 from 2019. The decline in incidents in 2024 is due to the fact that the year is incomplete as of the time of this project. 
+
+```{r echo=FALSE}
+library(dplyr, warn.conflicts = FALSE)
+
+# Suppress summarise info
+options(dplyr.summarise.inform = FALSE)
+
+shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
+shooting_data <- mutate(shooting_data, year = year(Date))
+
+df_shooting <- as.data.frame(shooting_data) %>%
+  filter(victim_race != "")
+
+df_shooting <- df_shooting %>%
+  mutate(victim_race = ifelse(v_hispanic_or_latinx == TRUE, "Hispanic or Latinx", victim_race))
+
+#Fatal Shootings by Race over Years Unfaceted
+props <- df_shooting %>%
+  filter(fatal == "TRUE") %>%
+  group_by(victim_race, year) %>%
+  summarize(count = n())
+props$yearSolid <- as.integer(props$year)
+
+#View(props)
+
+ggplot(props, aes(x = yearSolid, y = count, color = victim_race)) +
+  geom_line() +
+  labs(title = "Fatal Shootings by Race over Years", x = "Year", y = "Fatalities") + 
+  scale_color_discrete(name="Race") +
+  scale_x_continuous(breaks = unique(props$yearSolid))
+
+
+```
+
+
+```{r echo=FALSE}
+#Non Fatal Shootings by Race over Years Unfaceted
+props2 <- df_shooting %>%
+  filter(fatal == "FALSE") %>%
+  group_by(victim_race, year) %>%
+  summarize(count = n())
+props2$yearSolid <- as.integer(props2$year)
+
+#View(props4)
+
+ggplot(props2, aes(x = yearSolid, y = count, color = victim_race)) +
+  geom_line() +
+  labs(title = "Non Fatal Shootings by Race over Years", x = "Year", y = "Non Fatal Incidents") + 
+  scale_color_discrete(name="Race") +
+  scale_x_continuous(breaks = unique(props2$yearSolid))
+
+```
+
+
 #### **The Relationship Between Income and Safety**
 
 As we delve deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability.
@@ -160,4 +219,8 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
-#### **Racial Disparities and Fatal Outcomes**
+
+
+
+
+
