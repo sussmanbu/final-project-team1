@@ -3,9 +3,6 @@ title: "Big Picture"
 description: ""
 toc: true
 draft: FALSE
-editor: 
-  markdown: 
-    wrap: sentence
 ---
 
 ```{r echo = FALSE}
@@ -30,14 +27,11 @@ suppressPackageStartupMessages({
 
 # **Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?**
 
-![](images/The_Big_Picture_2.jpeg)
+![](images/big_picture.webp)
 
-In the heart of Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods.
-But what factors contribute to this grave issue?
-Our comprehensive analysis over the past decade seeks to uncover whether socioeconomic status could be the central factor in understanding and perhaps mitigating this violence.
+In the heart of Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods. But what factors contribute to this grave issue? Our comprehensive analysis on shooting data over the past decade seeks to uncover whether socioeconomic status could be the central factor in understanding and perhaps mitigating this violence.
 
-At the center of our study is a hypothesis: **Add final hypothesis**.
-By examining data from various neighborhoods, we explore how income, employment, education and race relate to the frequency of shootings.
+At the center of our study is a hypothesis: **Add final hypothesis**. By examining data from various neighborhoods, we explore how income, employment, education and race relate to the frequency of shootings.
 
 ## **Visual Analysis: The Story Through Numbers**
 
@@ -54,17 +48,11 @@ final_df%>%
   labs(title = 'Total Cases by District')
 ```
 
-The distribution of gun violence across Boston reveals significant disparities that echo through its neighborhoods.
-The bar chart above showcases the total number of shooting incidents by district, highlighting a varied landscape of safety across the city.
-Notably, districts like Mattapan, Roxbury and Dorchester experience far higher frequencies of violence compared to quieter areas like the East Boston and Brighton.
-This visualization not only illustrates these differences but sets the stage for a deeper exploration of underlying causes.
-What can these variations tell us about the resources and challenges faced by residents of different districts?
+The distribution of gun violence across Boston reveals significant disparities that echo through its neighborhoods. The bar chart above showcases the total number of shooting incidents by district, highlighting a varied landscape of safety across the city. Notably, districts like Mattapan, Roxbury and Dorchester experience far higher frequencies of violence compared to quieter areas like the East Boston and Brighton. This visualization not only illustrates these differences but sets the stage for a deeper exploration of underlying causes. What can these variations tell us about the resources and challenges faced by residents of different districts?
 
 #### **Racial Disparities and Fatal Outcomes**
 
-
-Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. 
-The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and "Unknown" consistently have an extremely low number of victims. It is worth nothing that there do not appear to be any recorded Asian fatalities. It is also worth nothing that for Black and African American, Hispanic or Latinx, and Unknown, there is a notable spike in Non-Fatal incidents in 2020 from 2019. The decline in incidents in 2024 is due to the fact that the year is incomplete as of the time of this project. 
+Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and "Unknown" consistently have an extremely low number of victims. It is worth noting that there do not appear to be any recorded Asian fatalities. It is also worth noting that for Black and African American, Hispanic or Latinx, and Unknown, there is a notable spike in Non-Fatal incidents in 2020 from 2019. The decline in incidents in 2024 is due to the fact that the year is incomplete as of the time of this project.
 
 ```{r echo=FALSE}
 library(dplyr, warn.conflicts = FALSE)
@@ -99,7 +87,6 @@ ggplot(props, aes(x = yearSolid, y = count, color = victim_race)) +
 
 ```
 
-
 ```{r echo=FALSE}
 #Non Fatal Shootings by Race over Years Unfaceted
 props2 <- df_shooting %>%
@@ -118,14 +105,11 @@ ggplot(props2, aes(x = yearSolid, y = count, color = victim_race)) +
 
 ```
 
-
 #### **The Relationship Between Income and Safety**
 
-As we delve deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability.
-In this section, we examine how the average median income across Boston's neighborhoods correlates with the number of shooting incidents they experience.
-The upcoming graph will visually showcase this relationship, revealing how economic conditions might directly influence the safety and wellbeing of residents.
+As we dive deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability. In this section, we examine how the average median income across Boston's neighborhoods correlates with the number of shooting incidents they experience. The upcoming graph will visually showcase this relationship, revealing how economic conditions might directly influence the safety and well-being of residents.
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE}
 #income plot
 correlation_coef <- final_df%>%
   group_by(district_name)%>%
@@ -142,8 +126,7 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
-The graph matches our initial assumptions, as districts with higher average median incomes typically report fewer shooting incidents.
-This moderate inverse relationship highlights economic stability as a potential buffer against violence.
+The graph matches our initial assumptions, as districts with higher average median incomes typically report fewer shooting incidents. This moderate inverse relationship highlights economic stability as a potential buffer against violence.
 
 ```{r echo=FALSE}
 
@@ -163,14 +146,11 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
-Notably, neighborhoods like South Boston and the Jamaica Plain, which hold the highest income levels, also exhibit some of the lowest rates of gun violence, contrasting sharply with areas like Mattapan and Roxbury.
-These findings suggest that improving economic conditions in lower-income districts could be a key strategy in reducing violence.
+Notably, neighborhoods like South Boston and the Jamaica Plain, which hold the highest income levels, also exhibit some of the lowest rates of gun violence, contrasting sharply with areas like Mattapan and Roxbury. These findings suggest that improving economic conditions in lower-income districts could be a key strategy in reducing violence.
 
 #### **Employment Status—A Safety Indicator?**
 
-Turning our focus to employment, we examine another vital socioeconomic indicator that may significantly influence urban safety: unemployment rates across Boston's districts.
-The following graph presents the correlation between average unemployment rates and the total number of shooting incidents, offering insights into how joblessness might increase the risks of violence.
-The data suggests a substantial link between higher unemployment and increased shooting incidents, hinting that employment stability could be a pivotal factor in enhancing community safety.
+Turning our focus to employment, we examine another vital socioeconomic indicator that may significantly influence urban safety: unemployment rates across Boston's districts. The following graph presents the correlation between average unemployment rates and the total number of shooting incidents, offering insights into how joblessness might increase the risks of violence. The data suggests a substantial link between higher unemployment and increased shooting incidents, hinting that employment stability could be a pivotal factor in enhancing community safety.
 
 ```{r echo=FALSE}
 #not in labor force plot
@@ -189,17 +169,11 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
-The graph depicts a clear trend where districts with higher unemployment rates, such as Mattapan and Roxbury, also report a greater number of shooting incidents.
-This visualization highlights the potential role of economic distress, manifesting as unemployment, in contributing to social instability and violence.
-Particularly striking is the high unemployment and corresponding number of cases in Roxbury, underscoring the urgency for targeted economic and employment support in such areas.
-On the other hand, districts like South and East Boston, which feature relatively lower unemployment rates, witness fewer shootings, supporting our theory that job creation and economic vitality might serve as effective deterrents to violence.
+The graph depicts a clear trend where districts with higher unemployment rates, such as Mattapan and Roxbury, also report a greater number of shooting incidents. This visualization highlights the potential role of economic distress, manifesting as unemployment, in contributing to social instability and violence. Particularly striking is the high unemployment and corresponding number of cases in Roxbury, underscoring the urgency for targeted economic and employment support in such areas. On the other hand, districts like South and East Boston, which feature relatively lower unemployment rates, witness fewer shootings, supporting our theory that job creation and economic vitality might serve as effective deterrents to violence.
 
 #### **Educational Attainment and Community Safety**
 
-Education shines through as a potential beacon of hope.
-The graph below illustrates the percentage of the population with bachelor’s degrees by district alongside the total number of shooting cases.
-It is evident that districts like Brighton and South Boston, which boast higher percentages of degree holders, report significantly fewer shootings compared to areas like Mattapan and Dorchester, where fewer residents have completed higher education.
-This trend is visually represented and suggests that enhancing educational opportunities could serve as a preventive measure against urban violence.
+Education shines through as a potential beacon of hope. The graph below illustrates the percentage of the population with bachelor’s degrees by district alongside the total number of shooting cases. It is evident that districts like Brighton and South Boston, which boast higher percentages of degree holders, report significantly fewer shootings compared to areas like Mattapan and Dorchester, where fewer residents have completed higher education. This trend is visually represented and suggests that enhancing educational opportunities could serve as a preventive measure against urban violence.
 
 ```{r echo=FALSE}
 
@@ -218,9 +192,3 @@ final_df%>%
   labs(y = 'Pct of Population with Bachelors ',title = 'Bachelors Degree and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
-
-
-
-
-
-
