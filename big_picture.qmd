@@ -9,8 +9,6 @@ draft: FALSE
 suppressPackageStartupMessages({
   final_df <- readRDS('all_census_dat.rdr')
 
-  #write.csv(merge_geometry, file = "census_dat.csv",row.names = FALSE)
-
   library(tidycensus)
   library(tidyverse)
   library(sandwich)
@@ -25,13 +23,13 @@ suppressPackageStartupMessages({
 
 ```
 
-# **Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?**
+# ***Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?***
 
 ![](images/big_picture.webp)
 
-In the heart of Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods. But what factors contribute to this grave issue? Our comprehensive analysis on shooting data over the past decade seeks to uncover whether socioeconomic status could be the central factor in understanding and perhaps mitigating this violence.
+In Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods. But what factors contribute to this grave issue? Our extensive study of shooting incidents over the last decade aims to determine if socioeconomic factors are at the heart of this issue. Could understanding these elements lead to a solution for the violence?
 
-At the center of our study is a hypothesis: **Add final hypothesis**. By examining data from various neighborhoods, we explore how income, employment, education and race relate to the frequency of shootings.
+At the center of our study is a hypothesis: *improving socioeconomic conditions—specifically income, employment, education, and racial equity—can significantly reduce the prevalence of shootings across Boston's neighborhoods*. By examining data from various neighborhoods, we explore how income, employment, education and race relate to the frequency of shootings.
 
 ## **Visual Analysis: The Story Through Numbers**
 
@@ -45,14 +43,18 @@ final_df%>%
   ggplot(aes(district_name,total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title = 'Total Cases by District')
+  labs(title = 'Total Cases by District',
+       x = "District Name",
+       y = "Total Cases")
 ```
 
 The distribution of gun violence across Boston reveals significant disparities that echo through its neighborhoods. The bar chart above showcases the total number of shooting incidents by district, highlighting a varied landscape of safety across the city. Notably, districts like Mattapan, Roxbury and Dorchester experience far higher frequencies of violence compared to quieter areas like the East Boston and Brighton. This visualization not only illustrates these differences but sets the stage for a deeper exploration of underlying causes. What can these variations tell us about the resources and challenges faced by residents of different districts?
 
 #### **Racial Disparities and Fatal Outcomes**
 
-Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and "Unknown" consistently have an extremely low number of victims. It is worth noting that there do not appear to be any recorded Asian fatalities. It is also worth noting that for Black and African American, Hispanic or Latinx, and Unknown, there is a notable spike in Non-Fatal incidents in 2020 from 2019. The decline in incidents in 2024 is due to the fact that the year is incomplete as of the time of this project.
+The data indicates significant racial disparities in shooting incidents. Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. \
+\
+The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and "Unknown" consistently have an extremely low number of victims. It is worth noting that there do not appear to be any recorded Asian fatalities. It is also worth noting that for Black and African American, Hispanic or Latinx, and Unknown, an intriguing pattern emerged in 2020, with a notable spike in non-fatal shootings among these groups, followed by a decrease in 2024—a year still in progress.
 
 ```{r echo=FALSE}
 library(dplyr, warn.conflicts = FALSE)
@@ -122,7 +124,7 @@ final_df%>%
   ggplot(aes( medincome_mean,total_cases))+
   geom_point()+
   geom_smooth(method ='lm')+
-  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  labs(x = 'Average Median Income', y = 'Total Cases', title = 'Avg Median Income and Total Cases Over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
@@ -142,7 +144,7 @@ final_df%>%
   ggplot(aes(district_name, medincome_mean,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')+
+  labs(y = 'Average Median Income', x = 'District Name', title = 'Avg Median Income and Total Cases Over All Years')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
@@ -165,7 +167,7 @@ final_df%>%
   ggplot(aes(district_name, unemployment_pct,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Pct Unemployed',title = 'Avg Unemployment and Total Cases')+
+  labs(y = 'Percent Unemployed', x='District Name', title = 'Average Unemployment and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
@@ -189,6 +191,10 @@ final_df%>%
   ggplot(aes(district_name, pct_bachelors,fill = total_cases))+
   geom_bar(stat= 'identity')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Pct of Population with Bachelors ',title = 'Bachelors Degree and Total Cases')+
+  labs(y = 'Percent of Population with Bachelors ', x = 'District Name', title = 'Bachelors Degree and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
+
+#### **A Safer Boston**
+
+Our comprehensive analysis paints a clear picture: socioeconomic factors are deeply intertwined with the safety of Boston’s neighborhoods. By addressing the economic, employment, and educational disparities, Boston can move toward a future where all residents have the opportunity to live in safety and prosperity. This study not only sheds light on the complexities of urban violence but also offers a blueprint for meaningful change. It is a call to action for policymakers, community leaders, and residents to unite in transforming Boston into a safer, more equitable city for all.
