@@ -20,125 +20,34 @@ This comes from the file `data.qmd`.
 We used the tidycensus package to add census data from the American Community Survey to our original data set. We are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied. We have also pulled demographic data and geolocation data to help analyze the distribution of incidents across races between Boston districts. The data tables will be merged based on each year of our initial shooting data set.
 
 Here is a slightly simplified version of the code we used to combine the tidycensus data with our original data set.
+
+
+First we merged census data based on districts, assigned tract number with their associated zip code and merged districts from tidycensus with our original data set.
+
 ```{r eval=FALSE}
 library(tidycensus)
 library(tidyverse)
-shooting_data <- read.csv(here::here("dataset", "BostonShootingDataClean.csv"))
-shooting_data <- mutate(shooting_data, year = year(Date))
-
-census_api_key('edc88cbdb20f0ecb1fde3abf4e45a732dd998e96')
-
-vars<-load_variables(2017, "acs5", cache = TRUE)
-
-filter_vars<-vars %>%
-  filter(str_detect(label, " one person"))
-
-zips<-c(2135,2121, 2122, 2124,...)
 
 
-#get acs data for each year in our data set
+#merge demographic data 
+demo<-read.csv(here::here("dataset", "redistricting_data_tract20_nbhd_hhpopsize_ab-1.csv"))
 
-dat_2020<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",
-                                hashighschooldiploma ='B15003_017E',
-                                employmentstatus = 'B23025_001E',
-                                #etc...
-                              ),
-                  
-                  zip = "MA", 
-                  year = 2020)
+district_names <-data.frame(district = c('A1','A15','A7','B2','B3','C6','C11','D4','D14','E5','E13','E18'),
+                            district_name = c('Downtown & Charlestown','Downtown & Charlestown','East Boston', 'Roxbury',
+                                              'Mattapan','South Boston','Dorchester','South End','Brighton','West Roxbury','Jamaica Plain','Hyde Park'))
 
-#filter for zipcodes in collected list of zipcodes.
-#Pivot so each variable has its own column
-df_2020<-dat_2020%>%
-  mutate(GEOID = as.integer(GEOID))%>%
-  filter(GEOID %in% zips)%>%
-  select(-moe)%>%
-  pivot_wider(names_from = variable, values_from = estimate)
-  
-#add year column
-df_2020 <- df_2020 %>% mutate(year = 2020)
+colnames(demo) <- as.character(unlist(demo[1,]))
+demo <- demo[-1,]
+colnames(demo)[1] <- "district_name"
 
+filtered_demo <- subset(demo, district_name %in% district_names$district_name)
 
-dat_2021<-get_acs(geography = 'zcta', 
-                  variables = c(medincome = "B19013_001",
-                                employment_status = 'B23025_001E',
-                                #etc...
-                  
-                  zip = "MA", 
-                  year = 2021)
+cleaned_data<-merge(date_time,filtered_demo,by = 'district_name')
+nrow(cleaned_data)
+sum(is.na(cleaned_data))
 
-
-df_2021<-dat_2021%>%
-  mutate(GEOID = as.integer(GEOID))%>%
-  filter(GEOID %in% zips)%>%
-  select(-moe)%>%
-  pivot_wider(names_from = variable, values_from = estimate)
-
-df_2021 <- df_2021 %>% mutate(year = 2021)
-
-## we repeat this process for each year to 2015
-
-
-#combine all the acs data into one table 
-combined_table <- bind_rows(df_2015, df_2016, 
-                            df_2017,df_2018, df_2019,
-                            df_2020,df_2021)
-
-
-new_column_names<-c(medincome = "B19013_001",employment_status = "B23025_001E",
-  pct_below_poverty_level = "B17001_002E", #etc...
-)
-
-#rename the census return variables
-df <- combined_table %>%
-  rename(
-    medincome = medincome,
-    no_english = B16004_005,
-    little_english = B16004_004,
-    has_highschool_diploma = B15003_017,
-    employment_status = B23025_001,
-    pct_below_poverty_level = B17001_002,
-    pct_homes_owner_occupied = DP04_0046P,
-    total_pop = B02001_002,
-    White_alone = B02001_003,
-    Black_or_African_American_alone = B02001_004,
-    American_Indian_and_Alaska_Native_alone = B02001_005,
-    Asian_alone = B02001_006, 
-    Native_Hawaiian_and_Other_Pacific_Islander_alone
-    = DP04_0046P,
-    pct_25_and_up_bachelors_degree
-    = pct_25_and_up_bachelors_degree
-  )
-
-colnames(df)
-
-#get original data set columns
-selected_columns <- shooting_data[, c(
-  "district_name",
-  "incident_num",
-  "Date",
-  "Time",
-  "district",
-  "victim_gender",
-  "victim_race",
-  "multi_victim",
-  "v_hispanic_or_latinx",
-  "fatal",
-  "Total."
-)]
-
-#add year column to shooting dataset 
-selected_columns$year <- year(as.Date(selected_columns$Date))
-
-
-
-
-zips<-c(02135,02121, 02122, 02124, ...)
-
-#add district names corresponding to zipcodes/Geoid 
-#for final merge with original dataset
-with_districts <- df %>%
+#add district names corresponding to zipcodes/Geoid for final merge with original dataset
+with_districts <- combined_df %>%
   mutate(district_name = case_when(
     GEOID == 2135 ~ "Brighton",
     GEOID %in% c(2121, 2122, 2124, 2125) ~ "Dorchester",
@@ -153,6 +62,7 @@ with_districts <- df %>%
     TRUE ~ NA_character_
   ))
 
+final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
 
 
 final_df<-merge(selected_columns,with_districts, by =
@@ -164,25 +74,3 @@ write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
 colnames(final_df)
 
 ```
-
-
-------------------------------------------------------------------------
-
-## Rubric: On this page
-
-You will
-
--   Describe where/how to find data.
-    -   You must include a link to the original data source(s). Make sure to provide attribution to those who collected the data.
-    -   Why was the data collected/curated? Who put it together? (This is important, if you don't know why it was collected then that might not be a good dataset to look at.
--   Describe the different data files used and what each variable means.
-    -   If you have many variables then only describe the most relevant ones and summarize the rest.
--   Describe any cleaning you had to do for your data.
-    -   You *must* include a link to your `load_and_clean_data.R` file.
-    -   Rename variables and recode factors to make data more clear.
-    -   Also, describe any additional R packages you used outside of those covered in class.
-    -   Describe and show code for how you combined multiple data files and any cleaning that was necessary for that.
-    -   Some repetition of what you do in your `load_and_clean_data.R` file is fine and encouraged if it helps explain what you did.
--   Organization, clarity, cleanliness of the page
-    -   Make sure to remove excessive warnings, use clean easy-to-read code (without side scrolling), organize with sections, use bullets and other organization tools, etc.
-    -   This page should be self-contained.
