@@ -140,6 +140,18 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Target potentially multiple header elements where "Big Picture" might be.
+  var headers = document.querySelectorAll('h1, .titleblock, header');
+  headers.forEach(function(header) {
+    if (header.textContent.includes("Big Picture")) {
+      header.style.display = 'none';  // Hide each header that includes "Big Picture"
+    }
+  });
+});
+</script>
+
 <section id="breaking-bostons-silence-does-socioeconomic-status-hold-the-key-to-gun-violence" class="level1">
 <h1><strong>Breaking Boston’s Silence: Does Socioeconomic Status Hold the Key to Gun Violence?</strong></h1>
 <p><img src="images/big_picture.webp" class="img-fluid"></p>
