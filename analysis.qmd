@@ -71,7 +71,11 @@ You will
     
 ```{r}
 
+#analysis summary: focus on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. 
+#Outline: 
+#summary statistics: correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books. 
 
+#Modeling: good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, where is our regressors more impactful?, compare to segregation index and map. 
 
 library(tidycensus)
 library(tidyverse)
@@ -194,7 +198,7 @@ ols_step_forward_p(ols)
 
 
 ```{r}
-#socieo economic and race 
+#socio economic and race 
 
 ols<-lm(total_cases~ asian_pct+pct_white+pct_black+nhpt_pct+aian_pct+travel_work+unemployment+medincome_mean+bachelors+one_parent+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
@@ -273,7 +277,7 @@ MA_tracts_seg%>%
 #
 
 
-#best data to run this is just socieo economic,
+#best data to run this is just socio economic,
 ols<-lm(total_cases~ unemployment+medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat)
 coeftest(ols, vcov. = vcovHC)
 summary(ols)
