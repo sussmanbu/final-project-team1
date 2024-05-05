@@ -28,7 +28,7 @@ suppressPackageStartupMessages({
 
 ```
 
-# **Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?** 
+# **Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?**
 
 ![](images/The_Big_Picture_2.jpeg)
 
@@ -83,7 +83,7 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
-The graph presents a compelling narrative, where districts with higher average median incomes typically report fewer shooting incidents.
+The graph matches our initial assumptions, as districts with higher average median incomes typically report fewer shooting incidents.
 This moderate inverse relationship highlights economic stability as a potential buffer against violence.
 
 ```{r echo=FALSE}
@@ -104,14 +104,14 @@ final_df%>%
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
 
-Notably, neighborhoods like South Boston and the South End, which feature higher income levels, also exhibit lower rates of gun violence, contrasting sharply with areas like Mattapan and Roxbury.
+Notably, neighborhoods like South Boston and the Jamaica Plain, which hold the highest income levels, also exhibit some of the lowest rates of gun violence, contrasting sharply with areas like Mattapan and Roxbury.
 These findings suggest that improving economic conditions in lower-income districts could be a key strategy in reducing violence.
 
 #### **Employment Status—A Safety Indicator?**
 
 Turning our focus to employment, we examine another vital socioeconomic indicator that may significantly influence urban safety: unemployment rates across Boston's districts.
-The following graph presents the correlation between average unemployment rates and the total number of shooting incidents, offering insights into how joblessness might exacerbate the risks of violence.
-With a correlation coefficient of 0.49, the data suggest a substantial link between higher unemployment and increased shooting incidents, hinting that employment stability could be a pivotal factor in enhancing community safety.
+The following graph presents the correlation between average unemployment rates and the total number of shooting incidents, offering insights into how joblessness might increase the risks of violence.
+The data suggests a substantial link between higher unemployment and increased shooting incidents, hinting that employment stability could be a pivotal factor in enhancing community safety.
 
 ```{r echo=FALSE}
 #not in labor force plot
@@ -132,14 +132,14 @@ final_df%>%
 
 The graph depicts a clear trend where districts with higher unemployment rates, such as Mattapan and Roxbury, also report a greater number of shooting incidents.
 This visualization highlights the potential role of economic distress, manifesting as unemployment, in contributing to social instability and violence.
-Particularly striking is the high unemployment and corresponding high number of cases in Mattapan, underscoring the urgency for targeted economic and employment support in such areas.
-On the other hand, districts like South Boston and the South End, which feature relatively lower unemployment rates, witness fewer shootings, supporting the theory that job creation and economic vitality might serve as effective deterrents to violence.
-This data not only enhances our understanding of the socioeconomic underpinnings of gun violence but also underscores the importance of employment initiatives as a strategy for crime prevention and community development.
+Particularly striking is the high unemployment and corresponding number of cases in Roxbury, underscoring the urgency for targeted economic and employment support in such areas.
+On the other hand, districts like South and East Boston, which feature relatively lower unemployment rates, witness fewer shootings, supporting our theory that job creation and economic vitality might serve as effective deterrents to violence.
 
 #### **Educational Attainment and Community Safety**
 
 Education shines through as a potential beacon of hope.
-Districts with higher percentages of bachelor's degree holders, such as Brighton and the South End, report fewer violent episodes.
+The graph below illustrates the percentage of the population with bachelor’s degrees by district alongside the total number of shooting cases.
+It is evident that districts like Brighton and South Boston, which boast higher percentages of degree holders, report significantly fewer shootings compared to areas like Mattapan and Dorchester, where fewer residents have completed higher education.
 This trend is visually represented and suggests that enhancing educational opportunities could serve as a preventive measure against urban violence.
 
 ```{r echo=FALSE}
@@ -159,9 +159,5 @@ final_df%>%
   labs(y = 'Pct of Population with Bachelors ',title = 'Bachelors Degree and Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
 ```
-
-The above graph illustrates the percentage of the population with bachelor’s degrees by district alongside the total number of shooting cases.
-It is evident that districts like Brighton and South Boston, which boast higher percentages of degree holders, report significantly fewer shootings compared to areas like Mattapan and Dorchester, where fewer residents have completed higher education.
-This visual trend is supported by the correlation coefficient, reinforcing the idea that education may serve as a protective factor against violence.
 
 #### **Racial Disparities and Fatal Outcomes**
