@@ -140,22 +140,10 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Target potentially multiple header elements where "Big Picture" might be.
-  var headers = document.querySelectorAll('h1, .titleblock, header');
-  headers.forEach(function(header) {
-    if (header.textContent.includes("Big Picture")) {
-      header.style.display = 'none';  // Hide each header that includes "Big Picture"
-    }
-  });
-});
-</script>
-
 <section id="breaking-bostons-silence-does-socioeconomic-status-hold-the-key-to-gun-violence" class="level1">
 <h1><strong>Breaking Boston’s Silence: Does Socioeconomic Status Hold the Key to Gun Violence?</strong></h1>
 <p><img src="images/big_picture.webp" class="img-fluid"></p>
-<p>In the heart of Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods. But what factors contribute to this grave issue? Our comprehensive analysis over the past decade seeks to uncover whether socioeconomic status could be the central factor in understanding and perhaps mitigating this violence.</p>
+<p>In the heart of Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods. But what factors contribute to this grave issue? Our comprehensive analysis on shooting data over the past decade seeks to uncover whether socioeconomic status could be the central factor in understanding and perhaps mitigating this violence.</p>
 <p>At the center of our study is a hypothesis: <strong>Add final hypothesis</strong>. By examining data from various neighborhoods, we explore how income, employment, education and race relate to the frequency of shootings.</p>
 <section id="visual-analysis-the-story-through-numbers" class="level2">
 <h2 class="anchored" data-anchor-id="visual-analysis-the-story-through-numbers"><strong>Visual Analysis: The Story Through Numbers</strong></h2>
@@ -170,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </section>
 <section id="racial-disparities-and-fatal-outcomes" class="level4">
 <h4 class="anchored" data-anchor-id="racial-disparities-and-fatal-outcomes"><strong>Racial Disparities and Fatal Outcomes</strong></h4>
-<p>Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and “Unknown” consistently have an extremely low number of victims. It is worth nothing that there do not appear to be any recorded Asian fatalities. It is also worth nothing that for Black and African American, Hispanic or Latinx, and Unknown, there is a notable spike in Non-Fatal incidents in 2020 from 2019. The decline in incidents in 2024 is due to the fact that the year is incomplete as of the time of this project.</p>
+<p>Across all years and districts, the races with the highest number of shooting incidents are Black and African American, as well as Hispanic or Latinx. This is the case for both Fatal and Non-Fatal shootings. The following graphs display the number of Fatal and Non-Fatal shootings by race every year. Although the number of incidents fluctuates a bit for each race every year, the relative number of incidents for each race compared to the others stays around the same. White, Asian, and “Unknown” consistently have an extremely low number of victims. It is worth noting that there do not appear to be any recorded Asian fatalities. It is also worth noting that for Black and African American, Hispanic or Latinx, and Unknown, there is a notable spike in Non-Fatal incidents in 2020 from 2019. The decline in incidents in 2024 is due to the fact that the year is incomplete as of the time of this project.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="big_picture_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
@@ -184,11 +172,8 @@ document.addEventListener("DOMContentLoaded", function() {
 </section>
 <section id="the-relationship-between-income-and-safety" class="level4">
 <h4 class="anchored" data-anchor-id="the-relationship-between-income-and-safety"><strong>The Relationship Between Income and Safety</strong></h4>
-<p>As we delve deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability. In this section, we examine how the average median income across Boston’s neighborhoods correlates with the number of shooting incidents they experience. The upcoming graph will visually showcase this relationship, revealing how economic conditions might directly influence the safety and wellbeing of residents.</p>
+<p>As we dive deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability. In this section, we examine how the average median income across Boston’s neighborhoods correlates with the number of shooting incidents they experience. The upcoming graph will visually showcase this relationship, revealing how economic conditions might directly influence the safety and well-being of residents.</p>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
-</div>
 <div class="cell-output-display">
 <p><img src="big_picture_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
