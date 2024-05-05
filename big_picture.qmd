@@ -25,7 +25,7 @@ suppressPackageStartupMessages({
 
 # ***Breaking Boston's Silence: Does Socioeconomic Status Hold the Key to Gun Violence?***
 
-![](images/big_picture.webp)
+![](images/crime.webp)
 
 In Boston, an unsettling pattern emerges—gun violence casts a long shadow across its diverse neighborhoods. But what factors contribute to this grave issue? Our extensive study of shooting incidents over the last decade aims to determine if socioeconomic factors are at the heart of this issue. Could understanding these elements lead to a solution for the violence?
 

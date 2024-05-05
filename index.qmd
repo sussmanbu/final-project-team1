@@ -1,5 +1,6 @@
 ---
 title: "Behind the Bullet"
+description: "A comprehensive analysis of Boston's socioeconomic factors and their impact on gun violence, aiming to identify actionable insights for enhancing community safety and reducing shooting incidents."
 listing:
   contents: "posts/*/*.qmd"
   sort: "date desc"
@@ -11,5 +12,6 @@ page-layout: full
 title-block-banner: true
 ---
 
-![](images/main.webp)
+![](images/boston.png)
 
+Below you'll find blog posts detailing our journey from initially proposing the project, exploring diverse datasets, and understanding the Boston shooting dataset's relevance to societal issues, through processes of cleaning, integrating demographic information, and modeling shooting incidents, to visualizing crime patterns, analyzing socioeconomic indicators, and developing forecasting models to understand and predict shooting occurrences in Boston:
