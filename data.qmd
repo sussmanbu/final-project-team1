@@ -78,7 +78,8 @@ library(tidyverse)
 
 
 #merge demographic data 
-demo<-read.csv(here::here("dataset", "redistricting_data_tract20_nbhd_hhpopsize_ab-1.csv"))
+demo<-read.csv(here::here("dataset", 
+                          "redistricting_data_tract20_nbhd_hhpopsize_ab-1.csv"))
 
 district_names <-data.frame(district = c('A1','A15','A7','B2','B3','C6',
                                   'C11','D4','D14','E5','E13','E18'),
@@ -98,7 +99,8 @@ cleaned_data<-merge(date_time,filtered_demo,by = 'district_name')
 nrow(cleaned_data)
 sum(is.na(cleaned_data))
 
-#add district names corresponding to zipcodes/Geoid for final merge with original dataset
+#add district names corresponding to zipcodes/Geoid for final merge 
+# with original dataset
 with_districts <- combined_df %>%
   mutate(district_name = case_when(
     GEOID == 2135 ~ "Brighton",
@@ -114,7 +116,8 @@ with_districts <- combined_df %>%
     TRUE ~ NA_character_
   ))
 
-final_df<-merge(selected_columns,with_districts, by = c('district_name','year'))
+final_df<-merge(selected_columns,with_districts, by = c('district_name',
+                                                        'year'))
 
 
 final_df<-merge(selected_columns,with_districts, by =
