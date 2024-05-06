@@ -111,25 +111,6 @@ ggplot(props2, aes(x = yearSolid, y = count, color = victim_race)) +
 
 As we dive deeper into the socioeconomic layers of Boston, our analysis shifts to one of the most telling indicators of community safety: economic stability. In this section, we examine how the average median income across Boston's neighborhoods correlates with the number of shooting incidents they experience. The upcoming graph will visually showcase this relationship, revealing how economic conditions might directly influence the safety and well-being of residents.
 
-```{r echo=FALSE, message = FALSE}
-#income plot
-correlation_coef <- final_df%>%
-  group_by(district_name)%>%
-  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
-  summarise(correlation_coef = round(cor(total_cases, medincome_mean),2)) 
-#scatterplot with line of best fit 
-final_df%>%
-  group_by(district_name)%>%
-  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes( medincome_mean,total_cases))+
-  geom_point()+
-  geom_smooth(method ='lm')+
-  labs(x = 'Average Median Income', y = 'Total Cases', title = 'Avg Median Income and Total Cases Over All Years')+
-  annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 1.5, vjust = 1)
-```
-
-The graph matches our initial assumptions, as districts with higher average median incomes typically report fewer shooting incidents. This moderate inverse relationship highlights economic stability as a potential buffer against violence.
-
 ```{r echo=FALSE}
 
 #income plot
