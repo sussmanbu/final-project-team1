@@ -32,9 +32,13 @@ library(tidyverse)
 #merge demographic data 
 demo<-read.csv(here::here("dataset", "redistricting_data_tract20_nbhd_hhpopsize_ab-1.csv"))
 
-district_names <-data.frame(district = c('A1','A15','A7','B2','B3','C6','C11','D4','D14','E5','E13','E18'),
-                            district_name = c('Downtown & Charlestown','Downtown & Charlestown','East Boston', 'Roxbury',
-                                              'Mattapan','South Boston','Dorchester','South End','Brighton','West Roxbury','Jamaica Plain','Hyde Park'))
+district_names <-data.frame(district = c('A1','A15','A7','B2','B3','C6',
+                                  'C11','D4','D14','E5','E13','E18'),
+                            
+district_name = 
+  c('Downtown & Charlestown','Downtown & Charlestown','East Boston', 'Roxbury',
+    'Mattapan','South Boston','Dorchester','South End','Brighton','West Roxbury',
+    'Jamaica Plain','Hyde Park'))
 
 colnames(demo) <- as.character(unlist(demo[1,]))
 demo <- demo[-1,]
