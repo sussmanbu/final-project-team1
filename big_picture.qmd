@@ -41,7 +41,7 @@ final_df%>%
   group_by(district_name)%>%
   summarise(total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name,total_cases))+
-  geom_bar(stat= 'identity')+
+  geom_bar(stat= 'identity', fill = 'steelblue')+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(title = 'Total Cases by District',
        x = "District Name",
