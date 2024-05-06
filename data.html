@@ -171,13 +171,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p><img src="images/data-import-cheatsheet-thumbs.png" class="img-fluid"></p>
-<p>This comes from the file <code>data.qmd</code>.</p>
-<p>Our primary data set comes from <a href="https://data.boston.gov/dataset/shootings/resource/73c7e069-701f-4910-986d-b950f46c91a1?inner_span=True">data.boston.gov</a> and contains data regarding shootings in the Boston area. Data was collected by the Boston Regional Intelligence Center under the Boston Police Department Bureau of Intelligence and Analysis. This data includes both fatal and non-fatal shootings (shooting_type_v2), if a victim was struck by a bullet within the City of Boston that falls under the jurisdiction of the Boston Police Department (district). The data does not include shootings that were deemed justifiable or self-inflicted gunshot wounds. The dataset serves as a benchmark for BPD to analyze safety and violence in Boston districts and to assess the allocation of their focus and resources. It was collected with the aim of monitoring and responding to shooting incidents within the city. The data is from 2015 forward. The data set is comprised of 1925 rows and 8 columns, labeled “incident_num”, “shooting_date”, “district”, “shooting_type_v2”, “victim_gender”, “victim_race”, “victim_ethnicity_NIBRS”, and “multi_victim”.</p>
-<p><a href="./scripts/load_and_clean_data.R">load_and_clean_data.R</a> has our cleaned data set.</p>
+<p><img src="images/data.webp" class="img-fluid"></p>
+<section id="data-source" class="level4">
+<h4 class="anchored" data-anchor-id="data-source"><strong>Data Source</strong></h4>
+<p>Our primary data set comes from <a href="https://data.boston.gov/dataset/shootings/resource/73c7e069-701f-4910-986d-b950f46c91a1?inner_span=True">data.boston.gov</a> and contains data regarding shootings in the Boston area. Data was collected by the Boston Regional Intelligence Center under the Boston Police Department Bureau of Intelligence and Analysis. This data includes both fatal and non-fatal shootings (<code>shooting_type_v2</code>), if a victim was struck by a bullet within the City of Boston that falls under the jurisdiction of the Boston Police Department (<code>district</code>). The data does not include shootings that were deemed justifiable or self-inflicted gunshot wounds. The data is from 2015 forward.</p>
+</section>
+<section id="purpose-of-the-data" class="level4">
+<h4 class="anchored" data-anchor-id="purpose-of-the-data"><strong>Purpose of the Data</strong></h4>
+<p>The dataset serves as a benchmark for the Boston Police Department to analyze safety and violence in Boston districts and to assess the allocation of their focus and resources. It was collected with the aim of monitoring and responding to shooting incidents within the city. Furthermore, the dataset aids in community safety initiatives and informs public policy regarding crime prevention and law enforcement effectiveness in Boston.</p>
+</section>
+<section id="dataset-overview" class="level4">
+<h4 class="anchored" data-anchor-id="dataset-overview"><strong>Dataset Overview</strong></h4>
+<p>The dataset consists of 1925 rows and 8 columns, detailing both fatal and non-fatal shooting incidents. Here’s a breakdown of the key variables:</p>
+<ul>
+<li><p><strong>incident_num</strong>: Unique identifier for each shooting incident.</p></li>
+<li><p><strong>shooting_date</strong>: Date when the shooting occurred.</p></li>
+<li><p><strong>district</strong>: Police district where the incident was reported.</p></li>
+<li><p><strong>shooting_type_v2</strong>: Specifies if the shooting was fatal or non-fatal.</p></li>
+<li><p><strong>victim_gender</strong>: Gender of the victim involved.</p></li>
+<li><p><strong>victim_race</strong>: Race of the victim.</p></li>
+<li><p><strong>victim_ethnicity_NIBRS</strong>: Ethnicity of the victim according to NIBRS standards.</p></li>
+<li><p><strong>multi_victim</strong>: Indicates if multiple victims were involved.</p></li>
+</ul>
+</section>
+<section id="data-cleaning-and-processing" class="level4">
+<h4 class="anchored" data-anchor-id="data-cleaning-and-processing"><strong>Data Cleaning and Processing</strong></h4>
+<p>The data cleaning and initial processing are documented in our R script, <a href="./scripts/load_and_clean_data.R">load_and_clean_data.R</a>. Key steps included:</p>
+<ul>
+<li><p>Removing entries with unknown or missing critical information to ensure data quality.</p></li>
+<li><p>Reformatting the <strong><code>victim_ethnicity_NIBRS</code></strong> into a boolean <strong><code>v_hispanic_or_latinx</code></strong> column for clearer demographic analysis.</p></li>
+<li><p>Simplifying the <strong><code>shooting_type_v2</code></strong> into a boolean <strong><code>fatal</code></strong> column to distinctly categorize incidents.</p></li>
+<li><p>Standardizing district names through a mapping dictionary to align with geographical descriptors used in public records.</p></li>
+</ul>
+</section>
+<section id="integration-of-additional-data-sources" class="level4">
+<h4 class="anchored" data-anchor-id="integration-of-additional-data-sources"><strong>Integration of Additional Data Sources</strong></h4>
 <p>We used the tidycensus package to add census data from the American Community Survey to our original data set. We are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied. We have also pulled demographic data and geolocation data to help analyze the distribution of incidents across races between Boston districts. The data tables will be merged based on each year of our initial shooting data set.</p>
-<p>Here is a slightly simplified version of the code we used to combine the tidycensus data with our original data set.</p>
-<p>First we merged census data based on districts, assigned tract number with their associated zip code and merged districts from tidycensus with our original data set.</p>
+<p>Here is a slightly simplified version of the code we used to combine the tidycensus data with our original data set. The integration process involved:</p>
+<ul>
+<li><p>Aligning census data with shooting incident data based on district codes.</p></li>
+<li><p>Merging datasets to create a comprehensive view that includes socio-economic factors along with shooting incidents.</p></li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidycensus)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -233,6 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
