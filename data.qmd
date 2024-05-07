@@ -27,23 +27,16 @@ Furthermore, the dataset aids in community safety initiatives and informs public
 #### **Dataset Overview**
 
 The dataset consists of 1925 rows and 8 columns, detailing both fatal and non-fatal shooting incidents.
-Here’s a breakdown of the key variables:
+Here’s a breakdown of the unchanged variables from the original data set:
 
--   **incident_num**: Unique identifier for each shooting incident.
 
--   **shooting_date**: Date when the shooting occurred.
+```{r echo = FALSE, results = 'show'}
+table <- data.frame(Variable = c( "incident_num", "shooting_date", "district", "shooting_type_v2", "victim_gender", "victim_race", "victim_ethnicity_NIBRS", "multi_victim"),
+                  Type = c("integer", "date", "string", "string", "string", "string", "string", "boolean"),
+                  Description = c("Unique identifier for each shooting incident.", "Date when the shooting occurred.", "Police district where the incident was reported", "Specifies if the shooting was fatal or non-fatal.", "Gender of the victim involved.", "Race of the victim.", "Ethnicity of the victim according to NIBRS standards.", "Indicates if multiple victims were involved."))
 
--   **district**: Police district where the incident was reported.
-
--   **shooting_type_v2**: Specifies if the shooting was fatal or non-fatal.
-
--   **victim_gender**: Gender of the victim involved.
-
--   **victim_race**: Race of the victim.
-
--   **victim_ethnicity_NIBRS**: Ethnicity of the victim according to NIBRS standards.
-
--   **multi_victim**: Indicates if multiple victims were involved.
+knitr::kable(table)
+```
 
 #### **Data Cleaning and Processing**
 
@@ -61,7 +54,7 @@ Key steps included:
 #### **Integration of Additional Data Sources**
 
 We used the tidycensus package to add census data from the American Community Survey to our original data set.
-We are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied.
+We are considering key indicators such as employment status, unemployment rate, median income, percent of single-parent households, and percentage of homes that are owner occupied.
 We have also pulled demographic data and geolocation data to help analyze the distribution of incidents across races between Boston districts.
 The data tables will be merged based on each year of our initial shooting data set.
 
