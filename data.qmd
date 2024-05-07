@@ -10,7 +10,7 @@ editor:
 
 ![](images/data.webp)
 
-#### **Data Source** 
+#### **Data Source**
 
 Our primary data set comes from [data.boston.gov](https://data.boston.gov/dataset/shootings/resource/73c7e069-701f-4910-986d-b950f46c91a1?inner_span=True) and contains data regarding shootings in the Boston area.
 Data was collected by the Boston Regional Intelligence Center under the Boston Police Department Bureau of Intelligence and Analysis.
