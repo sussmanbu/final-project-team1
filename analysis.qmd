@@ -15,9 +15,13 @@ Our analysis revolves around several pivotal questions: Does higher income corre
 
 ## **Analysis**
 
-analysis summary: focus on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. #Outline: #summary statistics: correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books.
+We focused on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. 
 
-#Modeling: good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, where is our regressors more impactful?, compare to segregation index and map.
+## **Summary Statistics**
+Correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books.
+
+## **Modeling**
+Good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio-economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, which regressors are more impactful, compare to segregation index and map.
 
 ```{r setup, echo=FALSE, results='hide'}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
@@ -64,19 +68,19 @@ lm_dat<-final_df%>%
 ```
 
 
-```{r echo=FALSE, results='hide'}
+
 
 
 ## **Descriptive Statistics: Correlation of Relevant Factors**
 To understand the underlying relationship between our independent and dependent variables, we calculated the correlation matrix to display the direction and magnitude of the relationships present in our data. As shown by the bottom row of our table, our dependent variable total cases is positively correlated with unemployment, the proportion ofsingle parent households in given district and percentage of the population that is black or African American. For interpretation, it is important to note that this does not imply a causal effect, and the following analysis will explain why certain demographics are more correlated with with total incidents by further exploring socioeconomic effects. 
 
 
-```{r}
+```{r echo=FALSE, results='hide'}
 
 matrix<-lm_dat%>%
   ungroup()%>%
   dplyr::select(-district_name,-year)%>%
-  cor(cor_dat)
+  cor()
 
 corrplot(matrix, method = 'color')
 
@@ -87,10 +91,10 @@ corrplot(matrix, method = 'color')
 
 ## **Exploratory Analysis: Relationships Between Variables**
 
-A key assumption in regression analysis is th
 
 
-```{r}
+
+```{r echo=FALSE, results='hide'}
 
 ggplot(lm_dat, aes(medincome_mean, total_cases, color = year))+
   geom_point()+
@@ -115,7 +119,7 @@ ggplot(lm_dat, aes(bachelors, total_cases, color = year))+
 ```
 
 
-```{r}
+```{r echo=FALSE, results='hide'}
 
 drop<-c(lm_dat$total_cases,lm_dat$travel_work,lm_dat$district_name,lm_dat$aian_pct,lm_dat$nhpt_pct ,lm_dat$asian_pct,lm_dat$pct_black,lm_dat$pct_white)
 
@@ -141,86 +145,22 @@ ggplot(facet_dat, aes(x = value, y = total_cases)) +
 ```
 
 
-```{r}
-#time to work plot 
-final_df%>%
-  group_by(district_name)%>%
-  na.omit(aggregate_time_to_work)%>%
-  summarise(work_time= mean(aggregate_time_to_work), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes( work_time,total_cases))+
-  geom_point()+
-  geom_smooth(method ='lm')+
-  labs(y = 'Avg travel time to work',title = 'Avg Travel Time to Work and Total Cases')
-
-```
-
-
-```{r}
-#income plot
-final_df%>%
-  group_by(district_name)%>%
-  summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(district_name, medincome_mean,fill = total_cases))+
-  geom_bar(stat= 'identity')+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(y = 'Avg median income',title = 'Avg Median Income and Total Cases Over All Years')
-
-```
-
-```{r}
-#single parent plot 
-final_df%>%
-  group_by(district_name)%>%
-  summarise(single_household = mean(one_parent/ total_house_units),total_cases = sum(!duplicated(incident_num))) %>%
-  ggplot(aes(district_name,single_household, fill = total_cases))+
-  geom_bar(stat= 'identity')+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs(title = 'Pct of Households with Single Parent')
-
-```
-```{r}
-
-ols<-lm(log(total_cases)~ pct_white+pct_black+asian_pct+nhpt_pct+aian_pct+district_name*pct_black, data = lm_dat)
-coeftest(ols, vcov.=vcovHC)
-ols_step_forward_p(ols)
-
-
-```
-
-```{r}
+```{r echo=TRUE, results = 'hide' }
 #ols all variables 
-
-lm_dat<-final_df%>%
-  group_by(district_name, year)%>%
-  summarise(aian_pct = mean(American_Indian_and_Alaska_Native_alone/total_pop),
-            nhpt_pct = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), 
-            asian_pct = mean(Asian_alone/total_pop),
-            pct_black = mean(Black_or_African_American_alone/total_pop),
-            pct_white = mean(White_alone/total_pop),
-            unemployment=mean(not_in_labor_force/total_pop),
-            medincome_mean= mean(household_medincome),
-            bachelors = mean(bachelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),
-            married_house= mean(married_households/total_house_units),
-            vacant_houses = mean(vacancy_status/total_house_units),
-            travel_work = mean(aggregate_time_to_work),
-            total_cases = sum(!duplicated(incident_num)))
-
-
 
 #OLS with all variables 
  
 #Log regression for all variables to normalize output, 
 
 full_model <- stepAIC(lm(log(total_cases) ~  pct_white+pct_black+pct_asian+pct_nhpt+pct_aian+district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat), direction = "both")
-coeftest(selected_model, vcov.=vcovHC)
+
 
 stargazer(full_model, title="Log Regression Results", align=TRUE, se = 'HC1') #html standard output table 
 
 
 #nonlinear, polynomial regression, refer to scatter plots to see the non linearity, 
 non_linear<-stepAIC(lm(total_cases ~ pct_asian+pct_nhpt+pct_aian+ unemployment+ medincome_mean+I(medincome_mean^2)+bachelors+I(bachelors^2)+one_parent+ vacant_houses, data = lm_dat), direction = "both")
-coeftest(non_linear, vcov.=vcovHC)
+
 
 stargazer(non_linear, title="Non-Linear Regression Results", align=TRUE, se = 'HC1')
 
@@ -230,7 +170,7 @@ stargazer(non_linear, title="Non-Linear Regression Results", align=TRUE, se = 'H
 
 
 
-```{r}
+```{r echo=FALSE, results='hide'}
 
 #map segregation index, relied on tidycensus book 
 
@@ -313,7 +253,7 @@ seg_lm%>%
 ```
 
 
-```{r}
+```{r echo=FALSE, results='hide'}
 
 #Geography weighted Regression 
 
