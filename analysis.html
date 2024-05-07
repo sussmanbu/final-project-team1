@@ -110,7 +110,15 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><strong>Introduction</strong></a></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis"><strong>Analysis</strong></a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><strong>Limitations</strong></a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -138,10 +146,13 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <p><img src="images/analysis.webp" class="img-fluid"></p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction"><strong>Introduction</strong></h2>
 <p>Urban violence remains a pervasive challenge that affects cities worldwide. In Boston, variations in violent crime rates across different neighborhoods suggest a complex interplay of socioeconomic factors. This study aims to dissect the relationship between socioeconomic status—measured through variables such as income, employment, and education—and the frequency of gun violence within Boston’s diverse districts. By exploring these relationships, the study seeks to identify potential mechanisms for policy action that could mitigate violence and enhance urban safety.</p>
 <p>Our analysis revolves around several pivotal questions: Does higher income correlate with lower incidences of gun violence? What role does employment stability play in mitigating urban violence? How does educational attainment influence these dynamics? We hypothesized that higher socioeconomic status, indicated by increased income levels, stable employment, and higher educational attainment, is associated with reduced instances of gun violence. To test these hypotheses, we employ statistical models, including linear and logistic regressions, to examine these relationships, focusing on extracting meaningful patterns from a decade of data. This approach allows us to assess the strength and significance of these socioeconomic factors in relation to urban violence, providing a data-driven basis for recommendations and policy considerations.</p>
-<section id="analysis" class="level4">
-<h4 class="anchored" data-anchor-id="analysis"><strong>Analysis</strong></h4>
+</section>
+<section id="analysis" class="level2">
+<h2 class="anchored" data-anchor-id="analysis"><strong>Analysis</strong></h2>
 <p>analysis summary: focus on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. #Outline: #summary statistics: correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books.</p>
 <p>#Modeling: good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, where is our regressors more impactful?, compare to segregation index and map.</p>
 <div class="cell">
@@ -158,8 +169,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="limitations" class="level4">
-<h4 class="anchored" data-anchor-id="limitations"><strong>Limitations</strong></h4>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations"><strong>Limitations</strong></h2>
 <p>The analysis conducted in this study faces several potential issues related to the data that could impact the validity and reliability of the findings. Among these is the inconsistency in reporting across different districts, which may arise from variations in how incidents are classified or documented by different officers, leading to differences in data quality. Moreover, the dataset excludes justifiable and self-inflicted shootings, potentially skewing the comprehensive understanding of the city’s gun violence.</p>
 <p>Additional challenges include potential biases in how incidents are reported. Systemic biases within law enforcement practices could influence reporting rates. For example, certain neighborhoods may experience underreporting due to strained community-police relations or resource constraints. Furthermore, differing enforcement practices could lead to an overrepresentation of certain demographics as victims, introducing biases that may distort the perceived demographic patterns of gun violence.</p>
 <p>These factors call for a cautious interpretation of the study’s results and point to the need for further research. Incorporating variables such as police presence, public health initiatives, and community programs, could provide a fuller picture of the factors influencing urban violence. Moreover, while this study identifies correlations between socioeconomic status and gun violence, establishing causation requires additional longitudinal and experimental research to explore the underlying mechanisms more definitively.</p>
