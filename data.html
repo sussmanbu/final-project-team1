@@ -182,17 +182,67 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="dataset-overview" class="level4">
 <h4 class="anchored" data-anchor-id="dataset-overview"><strong>Dataset Overview</strong></h4>
-<p>The dataset consists of 1925 rows and 8 columns, detailing both fatal and non-fatal shooting incidents. Here’s a breakdown of the key variables:</p>
-<ul>
-<li><p><strong>incident_num</strong>: Unique identifier for each shooting incident.</p></li>
-<li><p><strong>shooting_date</strong>: Date when the shooting occurred.</p></li>
-<li><p><strong>district</strong>: Police district where the incident was reported.</p></li>
-<li><p><strong>shooting_type_v2</strong>: Specifies if the shooting was fatal or non-fatal.</p></li>
-<li><p><strong>victim_gender</strong>: Gender of the victim involved.</p></li>
-<li><p><strong>victim_race</strong>: Race of the victim.</p></li>
-<li><p><strong>victim_ethnicity_NIBRS</strong>: Ethnicity of the victim according to NIBRS standards.</p></li>
-<li><p><strong>multi_victim</strong>: Indicates if multiple victims were involved.</p></li>
-</ul>
+<p>The dataset consists of 1925 rows and 8 columns, detailing both fatal and non-fatal shooting incidents. Here’s a breakdown of the unchanged variables from the original data set:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 9%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">incident_num</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Unique identifier for each shooting incident.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shooting_date</td>
+<td style="text-align: left;">date</td>
+<td style="text-align: left;">Date when the shooting occurred.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">district</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Police district where the incident was reported</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shooting_type_v2</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Specifies if the shooting was fatal or non-fatal.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">victim_gender</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Gender of the victim involved.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">victim_race</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Race of the victim.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">victim_ethnicity_NIBRS</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Ethnicity of the victim according to NIBRS standards.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">multi_victim</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Indicates if multiple victims were involved.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="data-cleaning-and-processing" class="level4">
 <h4 class="anchored" data-anchor-id="data-cleaning-and-processing"><strong>Data Cleaning and Processing</strong></h4>
@@ -206,7 +256,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="integration-of-additional-data-sources" class="level4">
 <h4 class="anchored" data-anchor-id="integration-of-additional-data-sources"><strong>Integration of Additional Data Sources</strong></h4>
-<p>We used the tidycensus package to add census data from the American Community Survey to our original data set. We are considering key indicators such as employment status, percentage of those above the poverty level, unemployment rate, median income, percent of single-parent households, high school graduate population, and percentage of homes that are owner occupied. We have also pulled demographic data and geolocation data to help analyze the distribution of incidents across races between Boston districts. The data tables will be merged based on each year of our initial shooting data set.</p>
+<p>We used the tidycensus package to add census data from the American Community Survey to our original data set. We are considering key indicators such as employment status, unemployment rate, median income, percent of single-parent households, and percentage of homes that are owner occupied. We have also pulled demographic data and geolocation data to help analyze the distribution of incidents across races between Boston districts. The data tables will be merged based on each year of our initial shooting data set.</p>
 <p>Here is a slightly simplified version of the code we used to combine the tidycensus data with our original data set. The integration process involved:</p>
 <ul>
 <li><p>Aligning census data with shooting incident data based on district codes.</p></li>

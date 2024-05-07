@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -116,6 +150,10 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><strong>Introduction</strong></a></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis"><strong>Analysis</strong></a></li>
+  <li><a href="#summary-statistics" id="toc-summary-statistics" class="nav-link" data-scroll-target="#summary-statistics"><strong>Summary Statistics</strong></a></li>
+  <li><a href="#modeling" id="toc-modeling" class="nav-link" data-scroll-target="#modeling"><strong>Modeling</strong></a></li>
+  <li><a href="#descriptive-statistics-correlation-of-relevant-factors" id="toc-descriptive-statistics-correlation-of-relevant-factors" class="nav-link" data-scroll-target="#descriptive-statistics-correlation-of-relevant-factors"><strong>Descriptive Statistics: Correlation of Relevant Factors</strong></a></li>
+  <li><a href="#exploratory-analysis-relationships-between-variables" id="toc-exploratory-analysis-relationships-between-variables" class="nav-link" data-scroll-target="#exploratory-analysis-relationships-between-variables"><strong>Exploratory Analysis: Relationships Between Variables</strong></a></li>
   <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><strong>Limitations</strong></a></li>
   </ul>
 </nav>
@@ -153,19 +191,76 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="analysis" class="level2">
 <h2 class="anchored" data-anchor-id="analysis"><strong>Analysis</strong></h2>
-<p>analysis summary: focus on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. #Outline: #summary statistics: correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books.</p>
-<p>#Modeling: good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, where is our regressors more impactful?, compare to segregation index and map.</p>
+<p>We focused on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district.</p>
+</section>
+<section id="summary-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="summary-statistics"><strong>Summary Statistics</strong></h2>
+<p>Correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books.</p>
+</section>
+<section id="modeling" class="level2">
+<h2 class="anchored" data-anchor-id="modeling"><strong>Modeling</strong></h2>
+<p>Good R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio-economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, which regressors are more impactful, compare to segregation index and map.</p>
+</section>
+<section id="descriptive-statistics-correlation-of-relevant-factors" class="level2">
+<h2 class="anchored" data-anchor-id="descriptive-statistics-correlation-of-relevant-factors"><strong>Descriptive Statistics: Correlation of Relevant Factors</strong></h2>
+<p>To understand the underlying relationship between our independent and dependent variables, we calculated the correlation matrix to display the direction and magnitude of the relationships present in our data. As shown by the bottom row of our table, our dependent variable total cases is positively correlated with unemployment, the proportion ofsingle parent households in given district and percentage of the population that is black or African American. For interpretation, it is important to note that this does not imply a causal effect, and the following analysis will explain why certain demographics are more correlated with with total incidents by further exploring socioeconomic effects.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="analysis_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="exploratory-analysis-relationships-between-variables" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-analysis-relationships-between-variables"><strong>Exploratory Analysis: Relationships Between Variables</strong></h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="analysis_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="analysis_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="analysis_files/figure-html/unnamed-chunk-3-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="analysis_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ols all variables </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#OLS with all variables </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Log regression for all variables to normalize output, </span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">stepAIC</span>(<span class="fu">lm</span>(<span class="fu">log</span>(total_cases) <span class="sc">~</span>  pct_white<span class="sc">+</span>pct_black<span class="sc">+</span>pct_asian<span class="sc">+</span>pct_nhpt<span class="sc">+</span>pct_aian<span class="sc">+</span>district_name<span class="sc">+</span> unemployment<span class="sc">+</span> medincome_mean<span class="sc">+</span>bachelors<span class="sc">+</span>one_parent<span class="sc">+</span> vacant_houses<span class="sc">+</span>married_house, <span class="at">data =</span> lm_dat), <span class="at">direction =</span> <span class="st">"both"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stargazer</span>(full_model, <span class="at">title=</span><span class="st">"Log Regression Results"</span>, <span class="at">align=</span><span class="cn">TRUE</span>, <span class="at">se =</span> <span class="st">'HC1'</span>) <span class="co">#html standard output table </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#nonlinear, polynomial regression, refer to scatter plots to see the non linearity, </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>non_linear<span class="ot">&lt;-</span><span class="fu">stepAIC</span>(<span class="fu">lm</span>(total_cases <span class="sc">~</span> pct_asian<span class="sc">+</span>pct_nhpt<span class="sc">+</span>pct_aian<span class="sc">+</span> unemployment<span class="sc">+</span> medincome_mean<span class="sc">+</span><span class="fu">I</span>(medincome_mean<span class="sc">^</span><span class="dv">2</span>)<span class="sc">+</span>bachelors<span class="sc">+</span><span class="fu">I</span>(bachelors<span class="sc">^</span><span class="dv">2</span>)<span class="sc">+</span>one_parent<span class="sc">+</span> vacant_houses, <span class="at">data =</span> lm_dat), <span class="at">direction =</span> <span class="st">"both"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stargazer</span>(non_linear, <span class="at">title=</span><span class="st">"Non-Linear Regression Results"</span>, <span class="at">align=</span><span class="cn">TRUE</span>, <span class="at">se =</span> <span class="st">'HC1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
 <div class="cell-output-display">
-<p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<p><img src="analysis_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid" width="672"></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="analysis_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="analysis_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
