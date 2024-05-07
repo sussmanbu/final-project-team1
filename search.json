@@ -18,35 +18,35 @@
     "href": "analysis.html#analysis",
     "title": "Analysis",
     "section": "Analysis",
-    "text": "Analysis\nWe focused on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district."
-  },
-  {
-    "objectID": "analysis.html#summary-statistics",
-    "href": "analysis.html#summary-statistics",
-    "title": "Analysis",
-    "section": "Summary Statistics",
-    "text": "Summary Statistics\nCorrelations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books."
-  },
-  {
-    "objectID": "analysis.html#modeling",
-    "href": "analysis.html#modeling",
-    "title": "Analysis",
-    "section": "Modeling",
-    "text": "Modeling\nGood R-Squared, above 90 for adjusted R-squared which is key, look at the relationship across spatial, socio-economic, and racial features, geospatial analysis to weight the proximity of our locations, plot Beta, which regressors are more impactful, compare to segregation index and map."
+    "text": "Analysis"
   },
   {
     "objectID": "analysis.html#descriptive-statistics-correlation-of-relevant-factors",
     "href": "analysis.html#descriptive-statistics-correlation-of-relevant-factors",
     "title": "Analysis",
     "section": "Descriptive Statistics: Correlation of Relevant Factors",
-    "text": "Descriptive Statistics: Correlation of Relevant Factors\nTo understand the underlying relationship between our independent and dependent variables, we calculated the correlation matrix to display the direction and magnitude of the relationships present in our data. As shown by the bottom row of our table, our dependent variable total cases is positively correlated with unemployment, the proportion ofsingle parent households in given district and percentage of the population that is black or African American. For interpretation, it is important to note that this does not imply a causal effect, and the following analysis will explain why certain demographics are more correlated with with total incidents by further exploring socioeconomic effects."
+    "text": "Descriptive Statistics: Correlation of Relevant Factors\nTo understand the underlying relationship between our independent and dependent variables, we calculated the correlation matrix to display the direction and magnitude of the relationships present in our data. As shown by the bottom row of our table, our dependent variable total cases is positively correlated with unemployment, the proportion of single parent households in a given district, and percentage of the population that is Black or African American. For interpretation, it is important to note that this does not imply a causal effect, and the following analysis will explain why certain demographics are more correlated with total incidents by further exploring socioeconomic effects."
   },
   {
     "objectID": "analysis.html#exploratory-analysis-relationships-between-variables",
     "href": "analysis.html#exploratory-analysis-relationships-between-variables",
     "title": "Analysis",
     "section": "Exploratory Analysis: Relationships Between Variables",
-    "text": "Exploratory Analysis: Relationships Between Variables\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#ols all variables \n\n#OLS with all variables \n \n#Log regression for all variables to normalize output, \n\nfull_model &lt;- stepAIC(lm(log(total_cases) ~  pct_white+pct_black+pct_asian+pct_nhpt+pct_aian+district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat), direction = \"both\")\n\n\nstargazer(full_model, title=\"Log Regression Results\", align=TRUE, se = 'HC1') #html standard output table \n\n\n#nonlinear, polynomial regression, refer to scatter plots to see the non linearity, \nnon_linear&lt;-stepAIC(lm(total_cases ~ pct_asian+pct_nhpt+pct_aian+ unemployment+ medincome_mean+I(medincome_mean^2)+bachelors+I(bachelors^2)+one_parent+ vacant_houses, data = lm_dat), direction = \"both\")\n\n\nstargazer(non_linear, title=\"Non-Linear Regression Results\", align=TRUE, se = 'HC1')"
+    "text": "Exploratory Analysis: Relationships Between Variables\nWhile our data is distributed across the Boston area, we are interested in the independent effects of each of our variables at the district level. We plot median income against the total number of cases to assess whether the direction and magnitude of correlation over all districts is still relevant. Considering Dorchester and Roxbury districts are where a significant proportion of incidents are reported, we see that as median income increases, total number of cases decreases indicating employment stability (or potentially higher pay) may play a significant role in hindering gun violence. Similarly in Mattapan there appears to be a slightly negative effect indicating the importance of median income in the top three districts for the total number of cases.\n\n\n\n\n\nBefore modeling our data, we would like to assess the linearity of each of our dependent variables with total cases. Given the individual scatter plots, it appears that median income and bachelors degree have increasing marginal effects, so we incorporate a polynomial term for each of these variables in the non linear regression model below. As part of our summary statistics, it is important to consider the following coefficients for each trend line; bachelor’s degree, number of married households, and median income displayed negative effects while single parent households, unemployment, and vacant houses displayed positive effects."
+  },
+  {
+    "objectID": "analysis.html#model-predictions",
+    "href": "analysis.html#model-predictions",
+    "title": "Analysis",
+    "section": "Model Predictions",
+    "text": "Model Predictions\nThe regression summaries output the results for two distinct models: a log regression that includes all of our variables for district, race and socioeconomic factors, and a non-linear regression with socioeconomic and race regressors. We performed variable selection utilizing AIC stopping criterion for both models to limit the potential for collinearity. When controlling for all factors, the percentage of white and black population were chosen in our variable selection process further demonstrating the importance of considering the segregation of Boston neighborhoods shown below. For our non linear regression, all variables selected our significance at the 5% level.\n\n\n\nLog Regression Results\n\n\n\n\n\n\n\n\n\nDependent variable:\n\n\n\n\n\n\n\n\n\n\n\n\nlog(total_cases)\n\n\n\n\n\n\n\n\npct_white\n\n\n-5.135* (2.865)\n\n\n\n\npct_black\n\n\n3.800 (2.347)\n\n\n\n\ndistrict_nameDorchester\n\n\n0.254 (1.452)\n\n\n\n\ndistrict_nameEast Boston\n\n\n-0.366 (0.448)\n\n\n\n\ndistrict_nameHyde Park\n\n\n-1.733 (1.563)\n\n\n\n\ndistrict_nameJamaica Plain\n\n\n-0.141 (0.824)\n\n\n\n\ndistrict_nameMattapan\n\n\n-0.744 (2.332)\n\n\n\n\ndistrict_nameRoxbury\n\n\n1.073 (1.041)\n\n\n\n\ndistrict_nameSouth Boston\n\n\n1.170*** (0.286)\n\n\n\n\ndistrict_nameSouth End\n\n\n0.551 (0.414)\n\n\n\n\nmarried_house\n\n\n15.891** (7.062)\n\n\n\n\nConstant\n\n\n1.501 (1.414)\n\n\n\n\n\n\n\n\nObservations\n\n\n63\n\n\n\n\nR2\n\n\n0.926\n\n\n\n\nAdjusted R2\n\n\n0.910\n\n\n\n\nResidual Std. Error\n\n\n0.374 (df = 51)\n\n\n\n\nF Statistic\n\n\n57.719*** (df = 11; 51)\n\n\n\n\n\n\n\n\nNote:\n\n\np&lt;0.1; p&lt;0.05; p&lt;0.01\n\n\n\n\n\n\nNon-Linear Regression Results\n\n\n\n\n\n\n\n\n\nDependent variable:\n\n\n\n\n\n\n\n\n\n\n\n\ntotal_cases\n\n\n\n\n\n\n\n\npct_asian\n\n\n-234.301*** (36.265)\n\n\n\n\npct_aian\n\n\n-1,568.577** (639.366)\n\n\n\n\nunemployment\n\n\n407.260*** (53.735)\n\n\n\n\nmedincome_mean\n\n\n-0.001*** (0.0004)\n\n\n\n\nI(medincome_mean2)\n\n\n0.000*** (0.000)\n\n\n\n\nConstant\n\n\n4.756 (21.885)\n\n\n\n\n\n\n\n\nObservations\n\n\n63\n\n\n\n\nR2\n\n\n0.688\n\n\n\n\nAdjusted R2\n\n\n0.661\n\n\n\n\nResidual Std. Error\n\n\n12.173 (df = 57)\n\n\n\n\nF Statistic\n\n\n25.162*** (df = 5; 57)\n\n\n\n\n\n\n\n\nNote:\n\n\np&lt;0.1; p&lt;0.05; p&lt;0.01"
+  },
+  {
+    "objectID": "analysis.html#geospatial-analysis",
+    "href": "analysis.html#geospatial-analysis",
+    "title": "Analysis",
+    "section": "Geospatial Analysis",
+    "text": "Geospatial Analysis\nThe segregation map shows the local segregation index of different areas in Boston. The higher an area’s index is (from 0 to 1), the less racially diverse it is. Notably, the most segregated areas are Roxbury and Mattapan. (South Boston).\n\n\n\n\n\nAs shown by our descriptive statistics and regression results, our data is highly correlated with location, therefore our regressors cannot be treated as randomly assigned and they violate the independence assumption for OLS. To overcome this limitation, we perform a geospatial robust weighted regression from the GWmodel R package which computes a local regression for each location, while including a distance decay function, or a weight added to the sum of linear combinations which specifies how observations outside the current location will be weighted. A kernel bandwidth is implemented to determine the cutoff distance for observations included. The local parameters returned by the model are plotted below.\nThis map shows how well our model performs in predicting cases among the Boston districts. Across the map, our score was close to 1, indicating a high accuracy (good model fit ~ most variables can be explained).\n\n\n\n\n\nThis map is another exemplification that as more bachelor’s degrees are attained, the number of cases decreases. This is especially true in areas that have a higher segregation index, so we can infer that higher level educational attainment has a significant effect on the number of cases in a geospatial location."
   },
   {
     "objectID": "analysis.html#limitations",
