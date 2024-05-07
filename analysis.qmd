@@ -7,11 +7,13 @@ draft: false
 
 ![](images/analysis.webp)
 
+## **Introduction**
+
 Urban violence remains a pervasive challenge that affects cities worldwide. In Boston, variations in violent crime rates across different neighborhoods suggest a complex interplay of socioeconomic factors. This study aims to dissect the relationship between socioeconomic status—measured through variables such as income, employment, and education—and the frequency of gun violence within Boston's diverse districts. By exploring these relationships, the study seeks to identify potential mechanisms for policy action that could mitigate violence and enhance urban safety.
 
 Our analysis revolves around several pivotal questions: Does higher income correlate with lower incidences of gun violence? What role does employment stability play in mitigating urban violence? How does educational attainment influence these dynamics? We hypothesized that higher socioeconomic status, indicated by increased income levels, stable employment, and higher educational attainment, is associated with reduced instances of gun violence. To test these hypotheses, we employ statistical models, including linear and logistic regressions, to examine these relationships, focusing on extracting meaningful patterns from a decade of data. This approach allows us to assess the strength and significance of these socioeconomic factors in relation to urban violence, providing a data-driven basis for recommendations and policy considerations.
 
-#### **Analysis**
+## **Analysis**
 
 analysis summary: focus on R-squared/adjusted R-squared, our models capture a majority of the variance in our dependent variable, total cases. Therefore, our choice of variables are good indicators and have substantial predictive power for the number of incidents in a given district. #Outline: #summary statistics: correlations of our independent variables with total cases, correlation table seems intuitive, for example as unemployment increases, total cases also increase. Show the distribution of our variables, include more creative plots for appeal, reference tidycensus,Rfor data science books.
 
@@ -258,7 +260,7 @@ ggplot(gw_model_results, aes(fill = unemployment)) +
 
 ```
 
-#### **Limitations**
+## **Limitations**
 
 The analysis conducted in this study faces several potential issues related to the data that could impact the validity and reliability of the findings. Among these is the inconsistency in reporting across different districts, which may arise from variations in how incidents are classified or documented by different officers, leading to differences in data quality. Moreover, the dataset excludes justifiable and self-inflicted shootings, potentially skewing the comprehensive understanding of the city’s gun violence.
 
