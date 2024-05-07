@@ -87,11 +87,10 @@ corrplot(matrix, method = 'color')
 
 ## **Exploratory Analysis: Relationships Between Variables**
 
-
+A key assumption in regression analysis is th
 
 
 ```{r}
-
 
 ggplot(lm_dat, aes(medincome_mean, total_cases, color = year))+
   geom_point()+
@@ -112,7 +111,6 @@ ggplot(lm_dat, aes(bachelors, total_cases, color = year))+
   geom_smooth(method = 'lm', se=FALSE)+
   facet_wrap(~district_name, scales = 'free_x')+
   labs(x = 'Pct of Population with Bachelors', y = 'Total Cases', Title = 'Relationship between Bachelors and Total Cases')
-
 
 ```
 
