@@ -60,47 +60,23 @@ lm_dat<-final_df%>%
             total_cases = sum(!duplicated(incident_num)))
 
 
-#correlation table for all independent variables
-independent_dat<-final_df%>%
-  group_by(district_name)%>%
-  summarise(pct_aian = mean(American_Indian_and_Alaska_Native_alone/total_pop),
-            pct_nhpt = mean(Native_Hawaiian_and_Other_Pacific_Islander_alone/total_pop), 
-            pct_asian = mean(Asian_alone/total_pop),
-            pct_black = mean(Black_or_African_American_alone/total_pop),
-            pct_white = mean(White_alone/total_pop),
-            unemployment=mean(not_in_labor_force/total_pop),
-            medincome_mean= mean(household_medincome),
-            bachelors = mean(bachelors_25/total_pop),
-            one_parent= mean(one_parent/total_house_units),
-            married_house= mean(married_households/total_house_units),
-            vacant_houses = mean(vacancy_status/total_house_units),
-            total_cases = sum(!duplicated(incident_num)))%>%
-  select(-district_name,-total_cases)
 
-dependent_dat<-final_df%>%
-  group_by(district_name)%>%
-  summarise(total_cases = sum(!duplicated(incident_num)))
+```
 
-correlation_coeffs <- cor(dependent_dat$total_cases, independent_dat)
 
-variable_names <- colnames(independent_dat)
-correlation_values <- as.vector(correlation_coeffs)
+```{r echo=FALSE, results='hide'}
 
-correlation_df <- data.frame(
-  Variable = variable_names,
-  Correlation_Coefficient = correlation_values
-)
 
-print(correlation_df)
+## **Descriptive Statistics: Correlation of Relevant Factors**
+To understand the underlying relationship between our independent and dependent variables, we calculated the correlation matrix to display the direction and magnitude of the relationships present in our data. As shown by the bottom row of our table, our dependent variable total cases is positively correlated with unemployment, the proportion ofsingle parent households in given district and percentage of the population that is black or African American. For interpretation, it is important to note that this does not imply a causal effect, and the following analysis will explain why certain demographics are more correlated with with total incidents by further exploring socioeconomic effects. 
 
-cor_dat<-lm_dat%>%
+
+```{r}
+
+matrix<-lm_dat%>%
   ungroup()%>%
-  select(-district_name,-year)%>%  
-  na.omit(travel_work)%>%
-  mutate(total_cases = as.numeric(total_cases))
-
-
-matrix<-cor(cor_dat)
+  dplyr::select(-district_name,-year)%>%
+  cor(cor_dat)
 
 corrplot(matrix, method = 'color')
 
@@ -109,10 +85,13 @@ corrplot(matrix, method = 'color')
 
 
 
+## **Exploratory Analysis: Relationships Between Variables**
+
 
 
 
 ```{r}
+
 
 ggplot(lm_dat, aes(medincome_mean, total_cases, color = year))+
   geom_point()+
@@ -238,20 +217,17 @@ lm_dat<-final_df%>%
 full_model <- stepAIC(lm(log(total_cases) ~  pct_white+pct_black+pct_asian+pct_nhpt+pct_aian+district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat), direction = "both")
 coeftest(selected_model, vcov.=vcovHC)
 
-stargazer(full_model, title="Log Regression Results", align=TRUE) #html standard output table 
+stargazer(full_model, title="Log Regression Results", align=TRUE, se = 'HC1') #html standard output table 
 
 
 #nonlinear, polynomial regression, refer to scatter plots to see the non linearity, 
 non_linear<-stepAIC(lm(total_cases ~ pct_asian+pct_nhpt+pct_aian+ unemployment+ medincome_mean+I(medincome_mean^2)+bachelors+I(bachelors^2)+one_parent+ vacant_houses, data = lm_dat), direction = "both")
 coeftest(non_linear, vcov.=vcovHC)
 
-stargazer(non_linear, title="Non-Linear Regression Results", align=TRUE)
+stargazer(non_linear, title="Non-Linear Regression Results", align=TRUE, se = 'HC1')
 
 
 ```
-
-
-
 
 
 
