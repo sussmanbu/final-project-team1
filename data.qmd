@@ -29,7 +29,6 @@ Furthermore, the dataset aids in community safety initiatives and informs public
 The dataset consists of 1925 rows and 8 columns, detailing both fatal and non-fatal shooting incidents.
 Here’s a breakdown of the unchanged variables from the original data set:
 
-
 ```{r echo = FALSE, results = 'show'}
 table <- data.frame(Variable = c( "incident_num", "shooting_date", "district", "shooting_type_v2", "victim_gender", "victim_race", "victim_ethnicity_NIBRS", "multi_victim"),
                   Type = c("integer", "date", "string", "string", "string", "string", "string", "boolean"),
@@ -64,11 +63,6 @@ The integration process involved:
 -   Aligning census data with shooting incident data based on district codes.
 
 -   Merging datasets to create a comprehensive view that includes socio-economic factors along with shooting incidents.
-
-
-#### **R Libraries Included**
-To obtain socioeconomic and demographic data, we utilized the tidycensus package to query census data. For our analysis, we utilized MASS to preform stepwise selection, GWmodel for geospatial regression, car to calculate VIF, sf to work with spatial data, segregation to calculate segregation index, ggpmisc to include statistical summaries in our plots, stargazer to formalize our regression results,corrplot for our correlation matrix, and tigris to color our maps. Additionally, we relied on chapter 7 and 8 from Analyzing US Census data for our analysis. 
-
 
 ```{r eval=FALSE}
 library(tidycensus)
@@ -127,3 +121,9 @@ write.csv(final_df, file = "census_dat.csv", row.names = FALSE)
 colnames(final_df)
 
 ```
+
+#### **R Libraries Included**
+
+To obtain socioeconomic and demographic data, we utilized the tidycensus package to query census data.
+For our analysis, we utilized MASS to preform stepwise selection, GWmodel for geospatial regression, car to calculate VIF, sf to work with spatial data, segregation to calculate segregation index, ggpmisc to include statistical summaries in our plots, stargazer to formalize our regression results,corrplot for our correlation matrix, and tigris to color our maps.
+Additionally, we relied on chapter 7 and 8 from Analyzing US Census data for our analysis.
