@@ -124,10 +124,11 @@ final_df%>%
   summarise(medincome_mean= mean(household_medincome), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name, medincome_mean,fill = total_cases))+
   geom_bar(stat= 'identity')+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   labs(y = 'Avg Median Income', x = 'District Name', title = 'Average Median Income and Total Cases Over All Years', fill= 'Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 2.5, vjust = 1)+ #chat GPT add correlation coefficient to barplot
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
 ```
 
 Notably, neighborhoods like South Boston and the Jamaica Plain, which hold the highest income levels, also exhibit some of the lowest rates of gun violence, contrasting sharply with areas like Mattapan and Roxbury. These findings suggest that improving economic conditions in lower-income districts could be a key strategy in reducing violence.
@@ -151,7 +152,9 @@ final_df%>%
   theme(axis.text.x = element_text(angle = 90, vjust = 2.5, hjust=1))+
   labs(y = 'Percent Unemployed', x='District Name', title = 'Average Unemployment and Total Cases', fill= 'Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 2.5, vjust = 1)+
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
 ```
 
 The graph depicts a clear trend where districts with higher unemployment rates, such as Mattapan and Roxbury, also report a greater number of shooting incidents. This visualization highlights the potential role of economic distress, manifesting as unemployment, in contributing to social instability and violence. Particularly striking is the high unemployment and corresponding number of cases in Roxbury, underscoring the urgency for targeted economic and employment support in such areas. On the other hand, districts like South and East Boston, which feature relatively lower unemployment rates, witness fewer shootings, supporting our theory that job creation and economic vitality might serve as effective deterrents to violence.
@@ -173,10 +176,11 @@ final_df%>%
   summarise(pct_bachelors= mean(bachelors_25/total_pop), total_cases = sum(!duplicated(incident_num))) %>%
   ggplot(aes(district_name, pct_bachelors,fill = total_cases))+
   geom_bar(stat= 'identity')+
-  theme(axis.text.x = element_text(angle = 90, vjust = 2.5, hjust=1))+
   labs(y = 'Percent with Bachelors Degree', x = 'District Name', title = 'Bachelors Degree and Total Cases', fill = 'Total Cases')+
   annotate("text", x = Inf, y = Inf, label = paste("Correlation coefficient: ", correlation_coef), hjust = 2.5, vjust = 1)+
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
 ```
 
 #### **A Safer Boston**
