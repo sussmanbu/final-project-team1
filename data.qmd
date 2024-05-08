@@ -65,6 +65,11 @@ The integration process involved:
 
 -   Merging datasets to create a comprehensive view that includes socio-economic factors along with shooting incidents.
 
+
+#### **R Libraries Included**
+To obtain socioeconomic and demographic data, we utilized the tidycensus package to query census data. For our analysis, we utilized MASS to preform stepwise selection, GWmodel for geospatial regression, car to calculate VIF, sf to work with spatial data, segregation to calculate segregation index, ggpmisc to include statistical summaries in our plots, stargazer to formalize our regression results,corrplot for our correlation matrix, and tigris to color our maps. Additionally, we relied on chapter 7 and 8 from Analyzing US Census data for our analysis. 
+
+
 ```{r eval=FALSE}
 library(tidycensus)
 library(tidyverse)

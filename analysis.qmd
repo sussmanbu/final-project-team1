@@ -24,23 +24,22 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 library(tidycensus)
 library(tidyverse)
-library(sandwich)
 library(lmtest)
 library(car)
-library(leaps)
 library(segregation)
 library(tigris)
 library(sf)
-library(olsrr)
 library(GWmodel)
 library(corrplot)
 library(MASS)
 library(stargazer)
+library(ggpmisc)
 
 final_df<-readRDS('all_census_dat.rdr')
 
 
-
+#data for models and correlation matrix
+# means to get the averaged effect across district tracts
 lm_dat<-final_df%>%
   group_by(district_name, year)%>%
   summarise(pct_aian = mean(American_Indian_and_Alaska_Native_alone/total_pop),
@@ -70,6 +69,7 @@ To understand the underlying relationship between our independent and dependent 
 
 ```{r echo=FALSE, results='hide'}
 
+#plot correlation matrix with corrplot library 
 matrix<-lm_dat%>%
   ungroup()%>%
   dplyr::select(-district_name,-year)%>%
@@ -89,11 +89,14 @@ While our data is distributed across the Boston area, we are interested in the i
 
 ```{r echo=FALSE, results='hide'}
 
+#facet plot for relationship between median income and each district
 ggplot(lm_dat, aes(medincome_mean, total_cases, color = year))+
   geom_point()+
   geom_smooth(method = 'lm', se=FALSE)+
   facet_wrap(~district_name, scales = 'free_x')+
-  labs(x = 'Median Income', y = 'Total Cases', Title = 'Relationship between Median Income and Total Cases')
+  labs(x = 'Median Income', y = 'Total Cases', Title = 'Relationship between Median Income and Total Cases', color = 'Year')+
+  theme_minimal()+
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 3)) #chat GPT limit the number of x axis ticks
 
 
 ```
@@ -102,9 +105,8 @@ Before modeling our data, we would like to assess the linearity of each of our d
 
 ```{r echo=FALSE, results='hide'}
 
-drop<-c(lm_dat$total_cases,lm_dat$travel_work,lm_dat$district_name,lm_dat$aian_pct,lm_dat$nhpt_pct ,lm_dat$asian_pct,lm_dat$pct_black,lm_dat$pct_white)
 
-
+#pivot dataframe to get the individual effect of each variable on total cases 
 df_long <- pivot_longer(lm_dat, cols = c(-year,-total_cases,-district_name,-pct_aian,-pct_nhpt,
                                          -pct_asian,-pct_black,-pct_white), names_to = "Variable", values_to = "Value")
 
@@ -117,10 +119,11 @@ facet_dat<-df_long%>%
 # Create the faceted scatter plot
 ggplot(facet_dat, aes(x = value, y = total_cases)) +
   geom_point(aes(color = district_name)) +
-  facet_wrap(~ Variable, scales = "free") +
+  facet_wrap(~ Variable, scales = "free_x") +
   geom_smooth(method='lm', se=FALSE)+
   theme_minimal()+
-  labs(y = 'Total Cases', title='Socioeconomic Variables and Total Cases')
+  labs(y = 'Total Cases', title='Socioeconomic Variables and Total Cases', color = 'District Name')+
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 3))
 
 
 ```
@@ -129,16 +132,9 @@ The regression summaries output the results for two distinct models: a log regre
 
 
 ```{r echo=FALSE, results ='hide'}
-#ols all variables 
-
-#OLS with all variables 
- 
-#Log regression for all variables to normalize output, 
+#Log regression for all variables 
 
 full_model <- stepAIC(lm(log(total_cases) ~  pct_white+pct_black+pct_asian+pct_nhpt+pct_aian+district_name+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses+married_house, data = lm_dat), direction = "both")
-
-
- #html standard output table 
 
 
 #nonlinear, polynomial regression, refer to scatter plots to see the non linearity, 
@@ -146,6 +142,8 @@ non_linear<-stepAIC(lm(total_cases ~ pct_asian+pct_nhpt+pct_aian+ unemployment+ 
 ```
 
 ```{r results = 'asis', echo = FALSE}
+#stargazer library to formalize regression outputs 
+
 stargazer(full_model,title="Log Regression Results", type = "html", single.row = TRUE)
 
 stargazer(non_linear, title="Non-Linear Regression Results", type = "html", single.row = TRUE)
@@ -160,7 +158,7 @@ The segregation map shows the local segregation index of different areas in Bost
 
 ```{r echo=FALSE, results='hide'}
 
-#map segregation index, relied on tidycensus book 
+#map segregation index, relied on tidycensus book chapter 8
 
 race_data<-c("White_alone", "Black_or_African_American_alone",
              "American_Indian_and_Alaska_Native_alone",
@@ -174,7 +172,6 @@ pivot_race<-final_df%>%
   group_by(ethnicity, GEOID_TRACT_20)%>%
   summarise(mean_population_count = mean(population_count))
 
-print(pivot_race, n =100)
 
 boston_local_seg <- pivot_race %>%
   mutual_local(
@@ -208,8 +205,7 @@ MA_tracts_seg%>%
   labs(fill = "Local\nsegregation index")
 
 
-#compare this to geospatial weighted regression maps 
-
+#regress segregation index on total cases
 
 seg_lm<-boston_local_seg%>%
   rename(GEOID_TRACT_20 = GEOID)%>%
@@ -220,29 +216,18 @@ seg_lm<-boston_local_seg%>%
 
 
 ols<-lm(total_cases~ seg_index, data = seg_lm)
-coeftest(ols, vcov.=vcovHC)
-
-library(ggpmisc)
+summary(ols)
 
 
-
-  
   
 
 ```
 
-As shown by our descriptive statistics and regression results, our data is highly correlated with location, therefore our regressors cannot be treated as randomly assigned and they violate the independence assumption for OLS. To overcome this limitation, we perform a geospatial robust weighted regression from the GWmodel R package which computes a local regression for each location, while including a distance decay function, or a weight added to the sum of linear combinations which specifies how observations outside the current location will be weighted. A kernel bandwidth is implemented to determine the cutoff distance for observations included. The local parameters returned by the model are plotted below. 
+As shown by our descriptive statistics and regression results, our data is highly correlated with location, therefore our regressors cannot be treated as randomly assigned and they violate the independence assumption for OLS. To overcome this limitation, we perform a geospatial robust weighted regression from the GWmodel R package which computes a local regression for each location, while including a distance decay function, or a weight added to the sum of linear combinations, which specifies how observations outside the current location will be incorporated. A kernel bandwidth is implemented to determine the cutoff distance for observations included. The local parameters returned by the model are plotted below. 
 
 ```{r echo=FALSE, results='hide'}
 
-#Geography weighted Regression 
-
-#Implemented with the GWmodel R package and spgwr package that offer a methods for a geographical robust weighted regreession
-# The GWR model computes a local regression model for each location, while including a distance decay function, or a weight added to sum of linear combinations which specifies how observations outside the current location will be weighted
-# relative to their distance. A kernel bandwith is implemented to determine the cutoff distnace for observations that will be included for a locations set of linear combinations
-# The GWR model returns local parameter estimates, and the local R-squared quatifying how much variance was captured in a given area. We plot the R-squared statistic for each location in our data below
-#
-
+#Geography weighted Regression, relied on tidycensus chapter 8
 
 geo_dat<-final_df%>%
   group_by(district_name,year)%>%
@@ -264,9 +249,6 @@ geo_dat<-final_df%>%
 geo_reg<-st_as_sf(geo_dat)%>%
   as_Spatial()
 
-#limitation: travel_work has na values, cannot include this in model, even though it would be great to have that plotted 
-
-#other variables we should add to aid analysis?
 
 formula2 <- "log(total_cases) ~ asian_pct+nhpt_pct+aian_pct+ unemployment+ medincome_mean+bachelors+one_parent+ vacant_houses"
 
@@ -302,18 +284,18 @@ ggplot(gw_model_results, aes(fill = Local_R2)) +
   theme_void()+
   labs(fill = 'Local R2')
 
-#great R-squared and all of our variables are statistically significant at least 10% level, this is good
-
 ```
 
 This map is another exemplification that as more bachelor’s degrees are attained, the number of cases decreases. This is especially true in areas that have a higher segregation index, so we can infer that higher level educational attainment has a significant effect on the number of cases in a geospatial location. 
 ```{r echo= FALSE, results='hide'}
-#where is the effect positive and negative, 
+
+#map the coefficient for bachelors degree 
+
 ggplot(gw_model_results, aes(fill = bachelors)) + 
   geom_sf(color = NA) + 
-  scale_fill_viridis_c(name = "Local β Bachelors", limits = quantile(gw_model_results$one_parent, c(0.05, 0.95))) +  # Set limits
+  scale_fill_viridis_c(name = "Local β Bachelors Degree", limits = quantile(gw_model_results$one_parent, c(0.05, 0.95))) +  # Set limits
   theme_void() + 
-  labs(fill = "Local β Bachelors")
+  labs(fill = "Local β Bachelors Degree")
 
 
 ```
